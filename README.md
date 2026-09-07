@@ -21,3 +21,5 @@ Work and internship details are bilingual and based on supplied CVs. The Tencent
 ## Development
 
 Use the project's pnpm environment and `pnpm dev`. Run `pnpm build` for a Cloudflare-compatible production build. Site registration is retained in `.openai/hosting.json`.
+
+Large video sources are stored as small binary parts in `media-source/`. Both development and build scripts reassemble them into `public/media/` and verify their SHA-256 hashes before starting. This changes only source transport, not video or audio quality. Keep all parts when cloning or moving this project.

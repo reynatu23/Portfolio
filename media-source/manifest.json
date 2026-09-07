@@ -1,0 +1,91 @@
+{
+  "files": [
+    {
+      "name": "bathroom.mp4",
+      "bytes": 19290097,
+      "sha256": "2faf1a703aeebb59d7697c1771021371225f08c499275ddf862ab0566e8a9abc",
+      "parts": [
+        "bathroom/000.part",
+        "bathroom/001.part",
+        "bathroom/002.part",
+        "bathroom/003.part",
+        "bathroom/004.part"
+      ]
+    },
+    {
+      "name": "john-lemon.mp4",
+      "bytes": 18991869,
+      "sha256": "6414ce3c93beccf9e05882b3a40e62de47211e98830ab259433a1b3fef34a40a",
+      "parts": [
+        "john-lemon/000.part",
+        "john-lemon/001.part",
+        "john-lemon/002.part",
+        "john-lemon/003.part",
+        "john-lemon/004.part"
+      ]
+    },
+    {
+      "name": "lifted.mp4",
+      "bytes": 20261526,
+      "sha256": "2487257a1cef0ab5ae6535756627feebb51fb3ae3aeeb3e61342358033ba2e87",
+      "parts": [
+        "lifted/000.part",
+        "lifted/001.part",
+        "lifted/002.part",
+        "lifted/003.part",
+        "lifted/004.part"
+      ]
+    },
+    {
+      "name": "retake.mp4",
+      "bytes": 20581848,
+      "sha256": "e0ba0f7d6eeb0f6763f283b8092ab7a6be05b58ba7b2646156b491c65ee74dc9",
+      "parts": [
+        "retake/000.part",
+        "retake/001.part",
+        "retake/002.part",
+        "retake/003.part",
+        "retake/004.part"
+      ]
+    },
+    {
+      "name": "tidal-surge.mp4",
+      "bytes": 21642135,
+      "sha256": "555f083f98f2df51567d95e6c48c076bcaa3737c0e623bda88df7331e6abb4a5",
+      "parts": [
+        "tidal-surge/000.part",
+        "tidal-surge/001.part",
+        "tidal-surge/002.part",
+        "tidal-surge/003.part",
+        "tidal-surge/004.part",
+        "tidal-surge/005.part"
+      ]
+    },
+    {
+      "name": "times-down.mp4",
+      "bytes": 21282525,
+      "sha256": "d65db04975737168953058f1706b8e2159f247eb9f61c6d8be35a7537cd95174",
+      "parts": [
+        "times-down/000.part",
+        "times-down/001.part",
+        "times-down/002.part",
+        "times-down/003.part",
+        "times-down/004.part",
+        "times-down/005.part"
+      ]
+    },
+    {
+      "name": "zoopunk.mp4",
+      "bytes": 21198461,
+      "sha256": "1d007023fdfd1cebc6d4848891ca52828b76cc34b9bcb595b25b53eaf5189d18",
+      "parts": [
+        "zoopunk/000.part",
+        "zoopunk/001.part",
+        "zoopunk/002.part",
+        "zoopunk/003.part",
+        "zoopunk/004.part",
+        "zoopunk/005.part"
+      ]
+    }
+  ]
+}
