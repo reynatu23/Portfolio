@@ -1,0 +1,50 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--foreground);
+  --color-muted-foreground: #acbbae;
+  --color-primary: #7ccdcc;
+  --color-primary-foreground: #13232b;
+  --color-border: #65796f;
+  --color-ring: #79d0d2;
+  --font-sans: Arial, 'PingFang SC', 'Microsoft Yahei', sans-serif;
+  --radius-lg: 6px;
+}
+:root,
+.dark {
+  --background: #141b1c;
+  --foreground: #ede7d8;
+  --popover: #20282a;
+  --accent: #77cbcc;
+  --radius: 6px;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family: Arial, 'PingFang SC', 'Microsoft Yahei', sans-serif;
+  color: var(--foreground);
+  background: var(--background);
+}
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+button {
+  font: inherit;
+  cursor: pointer;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid #79d0d2;
+  outline-offset: 5px;
+}

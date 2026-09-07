@@ -1,0 +1,1870 @@
+/* A listening room: oil-painted spaces, optical discs and album liner notes. */
+:root {
+  color-scheme: dark;
+  --brass: #d3b683;
+  --cyan: #79d0d2;
+  --ink: #293032;
+  --muted-ink: #b5b4a6;
+}
+body {
+  background: #141b1c;
+  color: #ede7d8;
+}
+button:focus-visible,
+a:focus-visible,
+summary:focus-visible {
+  outline: 2px solid #79d0d2;
+  outline-offset: 5px;
+}
+button:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+.cd-site {
+  max-width: 1720px;
+  margin: auto;
+  padding: 0 2.8vw;
+  min-height: 100vh;
+}
+.cd-site button {
+  color: inherit;
+}
+.cd-skip-link {
+  position: fixed;
+  z-index: 100;
+  top: -100px;
+  left: 24px;
+  padding: 16px;
+  background: #79d0d2;
+  color: #142329;
+}
+.cd-skip-link:focus {
+  top: 12px;
+}
+.cd-masthead {
+  min-height: 88px;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  background: #141b1cf5;
+  border-bottom: 1px solid #a996693e;
+  backdrop-filter: blur(16px);
+}
+.cd-wordmark {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-align: left;
+  background: none;
+  border: 0;
+  padding: 10px 0;
+}
+.cd-wordmark > span:first-child {
+  font:
+    italic 46px Georgia,
+    serif;
+  letter-spacing: -5px;
+  padding-right: 6px;
+  color: var(--brass);
+}
+.cd-wordmark > span:last-child {
+  font: 12px/1.8 monospace;
+  letter-spacing: 1.25px;
+}
+.cd-wordmark small {
+  display: block;
+  font-size: 12px;
+  letter-spacing: 0.8px;
+  color: #a3aaa7;
+}
+.cd-main-nav {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+.cd-main-nav button {
+  position: relative;
+  padding: 14px 0;
+  background: none;
+  border: 0;
+  font-size: 14px;
+  white-space: nowrap;
+}
+.cd-main-nav button::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--cyan);
+  transform: scaleX(0);
+  transition: transform 0.25s;
+}
+.cd-main-nav button[aria-current]::after,
+.cd-main-nav button:hover::after {
+  transform: scaleX(1);
+}
+.cd-header-actions {
+  display: flex;
+  gap: 10px;
+}
+.cd-header-actions button {
+  min-height: 42px;
+  padding: 8px 12px;
+  background: transparent;
+  border: 1px solid #b5ab8454;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.cd-header-actions .language-switch {
+  gap: 8px;
+}
+.language-switch b {
+  font-weight: 400;
+  color: #8a9694;
+}
+.language-switch b.active {
+  color: var(--cyan);
+}
+.sound-switch[aria-pressed='true'] {
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+.cd-audio-error {
+  display: block;
+  padding: 12px 0;
+  color: #e0b998;
+  font-size: 14px;
+}
+.environment-caption {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font: 12px/1.5 monospace;
+  letter-spacing: 1.4px;
+  color: #b1b2a5;
+}
+.painted-stage {
+  position: relative;
+  width: 100%;
+  height: clamp(420px, calc(100svh - 285px), 800px);
+  overflow: hidden;
+  border: 1px solid #a794624f;
+  background: #202e32;
+  transform-origin: 50% 60%;
+  isolation: isolate;
+}
+.front .painted-stage {
+  height: auto;
+  aspect-ratio: 1672 / 941;
+  max-height: none;
+}
+.painted-camera {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+.painted-room {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: fill;
+}
+.painted-sign {
+  position: absolute;
+  left: 37.3%;
+  top: 10.4%;
+  width: 28%;
+  height: 10%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(-0.6deg);
+  color: #e7c684;
+  text-shadow: 0 2px 3px #191f24;
+}
+.painted-sign span {
+  font: 12px monospace;
+  letter-spacing: 3px;
+}
+.painted-sign strong {
+  margin-top: 3px;
+  font:
+    600 clamp(17px, 2.1vw, 33px) Georgia,
+    serif;
+  letter-spacing: 1px;
+}
+.painted-door {
+  position: absolute;
+  left: 42%;
+  top: 27%;
+  width: 17%;
+  height: 57%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20% 0 16px;
+  border: 0;
+  background: transparent;
+  transition:
+    background 0.3s,
+    box-shadow 0.3s;
+}
+.painted-door:hover {
+  background: #ffcc5520;
+  box-shadow: 0 0 45px #eec14a25;
+}
+.door-insignia {
+  position: absolute;
+  top: 27%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: #e4e0c2;
+  opacity: 0.9;
+}
+.door-insignia strong {
+  font:
+    600 clamp(13px, 1.5vw, 23px)/1.1 Georgia,
+    serif;
+  letter-spacing: 1px;
+}
+.enter-label {
+  position: absolute;
+  bottom: 5%;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  white-space: nowrap;
+  background: #132329eb;
+  color: #ebd4a2;
+  border: 1px solid #c2a266;
+  box-shadow: 0 5px 15px #0005;
+}
+.studio-introduction {
+  position: absolute;
+  left: 4%;
+  bottom: 6%;
+  padding: 22px 25px;
+  max-width: 37%;
+  background: #101b22d9;
+  border-left: 2px solid #cba15e;
+  backdrop-filter: blur(4px);
+}
+.cd-site .overline,
+.cd-project-dialog .overline,
+.award-dialog .overline {
+  display: block;
+  font: 12px/1.65 monospace;
+  letter-spacing: 1.4px;
+}
+.studio-introduction .overline {
+  color: var(--brass);
+}
+.studio-introduction h1 {
+  font:
+    400 clamp(21px, 2.7vw, 43px)/1.45 Georgia,
+    'Songti SC',
+    serif;
+  margin: 12px 0;
+}
+.studio-introduction p {
+  margin: 0;
+  font-size: 14px;
+  color: #c2c2b4;
+}
+.sound-environment.shelf {
+  position: relative;
+  height: 220svh;
+}
+.explore-sticky {
+  position: sticky;
+  top: 88px;
+}
+.archive-title {
+  position: absolute;
+  left: 29%;
+  top: 13%;
+  width: 43%;
+  text-align: center;
+  color: #ead6a9;
+  text-shadow: 0 2px 8px #000c;
+}
+.archive-title .overline {
+  font-size: 12px;
+  letter-spacing: 3px;
+}
+.archive-title h1 {
+  font:
+    400 clamp(18px, 2.1vw, 32px)/1.4 Georgia,
+    'Songti SC',
+    serif;
+  margin: 9px 0;
+}
+.cd-cabinet {
+  position: absolute;
+  left: 31%;
+  width: 38%;
+  top: 29%;
+  bottom: 13%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 9% 18%;
+  perspective: 1000px;
+}
+.jewel-case {
+  position: relative;
+  display: block;
+  padding: 0;
+  justify-self: center;
+  height: 100%;
+  max-width: 100%;
+  aspect-ratio: 1.12;
+  background: #10232a;
+  border: 2px solid #9ec5c8a6;
+  box-shadow:
+    2px 3px 0 #16262b,
+    6px 10px 12px #0009;
+  transform: rotate(-3deg);
+  transform-style: preserve-3d;
+  transition:
+    transform 0.5s,
+    opacity 0.4s;
+}
+.jewel-case:nth-child(2) {
+  transform: rotate(4deg);
+}
+.jewel-case:nth-child(3) {
+  transform: rotate(2deg);
+}
+.jewel-case:nth-child(4) {
+  transform: rotate(-3deg);
+}
+.jewel-case:hover {
+  transform: translateY(-10px) rotate(0);
+  z-index: 5;
+}
+.jewel-case.picked {
+  transform: translateY(-12px) scale(1.1) rotate(0);
+  z-index: 10;
+}
+.has-picked .jewel-case:not(.picked) {
+  opacity: 0.65;
+}
+.case-tray {
+  position: absolute;
+  inset: 5% 3% 5% 11%;
+  display: grid;
+  place-items: center;
+  background: #152026;
+  border: 1px solid #adc1c63b;
+}
+.case-lid {
+  position: absolute;
+  inset: 2px 2px 2px 10%;
+  padding: 9%;
+  background: var(--album-color);
+  color: #14242a;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform-origin: left center;
+  transition: transform 0.6s cubic-bezier(0.2, 0.65, 0.25, 1);
+  backface-visibility: hidden;
+  border: 1px solid #dbe8dd78;
+  box-shadow: inset 0 0 0 4px #ffffff15;
+}
+.case-lid::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    transparent 30%,
+    #fff4 31%,
+    transparent 65%
+  );
+  pointer-events: none;
+}
+.case-catalogue,
+.case-edition {
+  font: 10px monospace;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+}
+.case-lid > strong {
+  font:
+    600 clamp(19px, 2.2vw, 37px)/1 Georgia,
+    serif;
+  letter-spacing: -1.5px;
+  margin: auto 0 5%;
+}
+.case-line {
+  height: 1px;
+  background: #1f343175;
+  margin: 4% 0;
+}
+.case-category {
+  font-size: clamp(12px, 1vw, 16px);
+  line-height: 1.3;
+}
+.case-lid > small {
+  margin-top: 5px;
+  font: 9px monospace;
+  letter-spacing: 0.3px;
+}
+.case-edition {
+  margin-top: auto;
+  padding-top: 10%;
+  font-size: 9px;
+}
+.case-edge {
+  position: absolute;
+  left: 0;
+  top: 3%;
+  bottom: 3%;
+  width: 8%;
+  writing-mode: vertical-rl;
+  color: #dae7df;
+  font: 9px monospace;
+  letter-spacing: 1px;
+  text-align: center;
+}
+.jewel-case.picked .case-lid {
+  transform: rotateY(-65deg);
+}
+.case-opening .jewel-case.picked .case-lid {
+  transform: rotateY(-120deg);
+}
+.cabinet-shelf {
+  position: absolute;
+  left: -8%;
+  width: 116%;
+  height: 8px;
+  background: linear-gradient(#a9986a, #4c4639);
+  box-shadow: 0 7px 8px #0008;
+  pointer-events: none;
+  z-index: -1;
+}
+.cabinet-shelf.first {
+  top: 46.5%;
+}
+.cabinet-shelf.second {
+  bottom: -4px;
+}
+.optical-disc {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 15deg,
+    #99b6c2,
+    #e8eadf 12%,
+    #7ca39e 17%,
+    #cb8baa 22%,
+    #e7d7a8 28%,
+    #657f90 38%,
+    #bcd7d7 50%,
+    #ddd9c3 58%,
+    #85c4c9 63%,
+    #7f779b 69%,
+    #d7bd9e 77%,
+    #688d9b 89%,
+    #b7c2bf
+  );
+  border: 1px solid #f1e9d98c;
+  box-shadow:
+    0 5px 18px #0006,
+    inset 0 0 0 4px #15232d55;
+  overflow: hidden;
+  mask-image: radial-gradient(circle, transparent 0 6.5%, #000 7%);
+}
+.optical-disc::before {
+  content: '';
+  position: absolute;
+  inset: 3%;
+  border-radius: inherit;
+  background: repeating-radial-gradient(
+    circle,
+    transparent 0 2px,
+    #24353a1a 2.5px 3px
+  );
+}
+.disc-print {
+  position: absolute;
+  inset: 0;
+  padding-top: 17%;
+  text-align: center;
+  color: #14252ccc;
+  background: linear-gradient(
+    20deg,
+    transparent 40%,
+    color-mix(in srgb, var(--disc-tint), transparent 65%) 70%,
+    transparent
+  );
+}
+.disc-print span {
+  font: 9px monospace;
+  letter-spacing: 1px;
+}
+.disc-print strong {
+  position: absolute;
+  bottom: 17%;
+  left: 0;
+  width: 100%;
+  font:
+    500 38px Georgia,
+    serif;
+}
+.disc-print small {
+  display: block;
+  font: 8px monospace;
+  letter-spacing: 1px;
+  margin-top: 3px;
+}
+.disc-hub {
+  position: absolute;
+  left: 35%;
+  top: 35%;
+  width: 30%;
+  height: 30%;
+  border-radius: 50%;
+  border: 1px solid #e0e8dc8c;
+  box-shadow:
+    inset 0 0 0 8px #a0aba737,
+    0 0 0 2px #27495435;
+  background: #b8c0b75c;
+}
+.disc-matrix {
+  position: absolute;
+  bottom: 8%;
+  width: 100%;
+  left: 0;
+  text-align: center;
+  font: 7px monospace;
+  letter-spacing: 1px;
+  color: #17262e;
+}
+.rotating {
+  animation: disc-spin 24s linear infinite;
+}
+@keyframes disc-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.wall-awards {
+  position: absolute;
+  top: 27%;
+  left: 76%;
+  width: 17%;
+  color: #d4b37c;
+  text-align: center;
+}
+.wall-awards > .overline {
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-shadow: 1px 2px 3px #000;
+}
+.medals-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 8px;
+  margin-top: 8px;
+}
+.wall-medal {
+  border: 0;
+  background: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 4px 5px;
+  transform-origin: top center;
+  transition: transform 0.3s;
+}
+.wall-medal:hover {
+  transform: rotate(7deg) scale(1.1);
+}
+.medal-ribbon {
+  width: 20px;
+  height: clamp(15px, 2.2vw, 33px);
+  background: linear-gradient(
+    90deg,
+    #4a111e 0 22%,
+    #bb8569 23% 33%,
+    #74273f 34% 66%,
+    #bb8569 67% 77%,
+    #4a111e 78%
+  );
+  box-shadow: 2px 2px 3px #0007;
+}
+.medallion {
+  width: clamp(42px, 4.2vw, 68px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    135deg,
+    #efd6a0,
+    #b18e4a 48%,
+    #755933 70%,
+    #ceb179
+  );
+  color: #44381f;
+  border: 3px double #e3c68f;
+  box-shadow: 2px 4px 8px #0008;
+}
+.medallion strong {
+  font:
+    12px Georgia,
+    serif;
+}
+.medal-date {
+  font: 11px monospace;
+  margin-top: 4px;
+  color: #d7c6a1;
+  text-shadow: 0 1px 3px #000;
+}
+.desk-hotspot {
+  position: absolute;
+  bottom: 15%;
+  left: 4%;
+  padding: 10px 12px;
+  border: 1px solid #c8d4b85f;
+  background: #11272bdb;
+  font: 12px monospace;
+}
+.desk-hotspot span {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.outside-button {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  border: 1px solid #b3aa8585;
+  background: #172126ed;
+  padding: 12px 15px;
+  font-size: 14px;
+  z-index: 12;
+}
+.room-cue {
+  position: absolute;
+  bottom: 17px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 11px;
+  background: #0c1e26de;
+  font: 12px monospace;
+  color: #b9d4cb;
+}
+.status-lamp {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #88d7c2;
+  box-shadow: 0 0 10px #66baac;
+}
+.exploration-toolbar {
+  min-height: 63px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+}
+.exploration-toolbar nav {
+  display: flex;
+  gap: 5px;
+}
+.exploration-toolbar nav button {
+  display: flex;
+  gap: 9px;
+  padding: 11px 13px;
+  border: 1px solid transparent;
+  background: none;
+  font-size: 14px;
+  white-space: nowrap;
+}
+.exploration-toolbar nav button span {
+  font: 12px monospace;
+  color: #8eada8;
+}
+.exploration-toolbar nav button[aria-current] {
+  background: #274447;
+  border-color: #729c9859;
+}
+.explore-help {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #a1aea8;
+  font-size: 13px;
+}
+.case-actions {
+  display: flex;
+  gap: 6px;
+}
+.case-actions button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #c8ac7c;
+  color: #1c2c30;
+  border: 0;
+  padding: 11px 14px;
+  font-size: 14px;
+}
+.exploration-progress {
+  height: 2px;
+  background: #a2b7a61b;
+}
+.exploration-progress > div {
+  height: 100%;
+  background: #84c9c6;
+}
+.album-shortcuts {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border: 1px solid #b5a1766b;
+  border-top: 0;
+}
+.album-shortcuts button {
+  min-height: 65px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 22px;
+  background: #273433;
+  border: 0;
+  border-right: 1px solid #b5a17652;
+  text-align: left;
+  transition: background 0.25s;
+}
+.album-shortcuts button:last-child {
+  border-right: 0;
+}
+.album-shortcuts button:hover {
+  background: #3c5553;
+}
+.album-shortcuts button > span {
+  font: 12px monospace;
+  color: #b2c3b5;
+}
+.album-shortcuts strong {
+  font-size: 16px;
+  font-weight: 400;
+}
+.album-shortcuts svg {
+  margin-left: auto;
+  color: #d6bc8f;
+  flex-shrink: 0;
+}
+.environment-footer {
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: #9ba69e;
+  font-size: 12px;
+}
+.environment-footer > span:first-child {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.image-fallback {
+  position: absolute;
+  bottom: 15px;
+  left: 15px;
+  padding: 15px;
+  background: #172126;
+  font-size: 14px;
+}
+.site-colophon {
+  border-top: 1px solid #a996693e;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 80px;
+  color: #aeb5a8;
+  font: 12px monospace;
+}
+.site-colophon button {
+  border: 0;
+  background: none;
+  padding: 12px;
+  font:
+    14px Arial,
+    sans-serif;
+}
+.site-colophon a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #d9c79e;
+}
+.listening-room {
+  padding-bottom: 28px;
+}
+.album-breadcrumb {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 70px;
+  color: #b8bdad;
+  font: 12px monospace;
+  letter-spacing: 1px;
+}
+.album-breadcrumb button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  background: none;
+  padding: 12px 0;
+  font:
+    14px Arial,
+    sans-serif;
+}
+.open-album {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  max-width: 1320px;
+  margin: auto;
+  align-items: start;
+  border: 1px solid #799092;
+  border-radius: 7px;
+  padding: 8px;
+  gap: 10px;
+  background: linear-gradient(125deg, #45555477, #0b161d, #78888b55);
+  box-shadow:
+    0 35px 80px #0005,
+    inset 0 0 0 3px #d3dec710;
+}
+.disc-side {
+  position: sticky;
+  top: 105px;
+  min-width: 0;
+  padding: 24px 30px;
+  border: 1px solid #6e81834d;
+  border-radius: 5px;
+  background: #1b282dde;
+  box-shadow: inset 0 0 35px #030c1077;
+}
+.side-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font: 12px/1.5 monospace;
+  letter-spacing: 1px;
+  color: #a3b7b4;
+}
+.disc-cradle {
+  position: relative;
+  padding: 25px;
+  margin: 20px auto 24px;
+  width: min(100%, 360px);
+  border: 1px solid #a3bec228;
+  border-radius: 12px;
+  background: radial-gradient(
+    circle,
+    #091a21 0 60%,
+    #26383e 61% 63%,
+    #17262c 64%
+  );
+  box-shadow: inset 0 0 12px #0b131a;
+}
+.disc-cradle .disc-print span {
+  font-size: 11px;
+}
+.disc-cradle .disc-print small {
+  font-size: 10px;
+}
+.disc-cradle .disc-print strong {
+  font-size: 62px;
+}
+.disc-cradle .disc-matrix {
+  font-size: 9px;
+}
+.disc-caption {
+  text-align: center;
+}
+.disc-caption .overline {
+  color: #aebfba;
+}
+.disc-caption h1 {
+  margin: 12px 0 6px;
+  font:
+    400 clamp(25px, 3vw, 40px)/1.3 Georgia,
+    'Songti SC',
+    serif;
+  color: #e5d3aa;
+}
+.disc-caption p {
+  margin: 0 0 24px;
+  font-size: 14px;
+  color: #aab9b3;
+}
+.album-tracklist {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 16px;
+}
+.album-tracklist button {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 13px 0;
+  border: 0;
+  border-bottom: 1px solid #99b5b328;
+  background: none;
+  text-align: left;
+  font-size: 14px;
+  line-height: 1.4;
+}
+.album-tracklist button > span {
+  color: #80aaa9;
+  font: 12px monospace;
+}
+.album-tracklist button svg {
+  margin-left: auto;
+  flex-shrink: 0;
+  opacity: 0;
+}
+.album-tracklist button[aria-current] {
+  color: #82d6d4;
+}
+.album-tracklist button[aria-current] svg,
+.album-tracklist button:hover svg {
+  opacity: 1;
+}
+.album-contact {
+  margin-top: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 9px;
+  color: #a8b6b2;
+  font-size: 13px;
+}
+.album-insert {
+  position: relative;
+  min-width: 0;
+  min-height: 790px;
+  padding: 28px 32px 70px;
+  background: #d6ceb8;
+  color: #283534;
+  border-radius: 2px;
+  box-shadow:
+    inset 0 0 0 1px #f2e6c7,
+    inset 12px 0 18px -14px #181914;
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent 0 3px,
+    #65542904 3px 4px
+  );
+  animation: insert-arrive 0.35s ease-out;
+}
+@keyframes insert-arrive {
+  from {
+    opacity: 0.5;
+    transform: translateX(8px);
+  }
+}
+.album-insert .side-label {
+  color: #56645d;
+}
+.album-insert h2 {
+  font:
+    400 clamp(27px, 3vw, 42px)/1.35 Georgia,
+    'Songti SC',
+    serif;
+  margin: 28px 0 32px;
+  letter-spacing: -1px;
+  text-shadow: 0 1px #fff5;
+}
+.record-projects {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px 20px;
+}
+.record-project {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  text-align: left;
+}
+.record-project:first-child {
+  grid-column: 1 / -1;
+}
+.record-frame {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 16/9;
+  overflow: hidden;
+  background: #26322e;
+  border: 1px solid #2739347a;
+}
+.record-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.6s;
+}
+.record-project:hover img {
+  transform: scale(1.05);
+}
+.record-play {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  width: 35px;
+  height: 35px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #e1e6c6aa;
+  color: #eee9d3;
+  background: #102726d9;
+  border-radius: 50%;
+}
+.record-duration {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  padding: 5px 7px;
+  font: 12px monospace;
+  color: #fff;
+  background: #172a2bed;
+}
+.record-type {
+  margin-top: 12px;
+  color: #58645a;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.record-project > strong {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  margin: 5px 0 8px;
+  font:
+    500 21px/1.3 Georgia,
+    'Songti SC',
+    serif;
+}
+.record-project > strong svg {
+  flex-shrink: 0;
+}
+.record-summary {
+  font-size: 14px;
+  color: #4a574e;
+  line-height: 1.7;
+}
+.cinema-projects {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+.broadcast-mark {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 52px 20px 75px;
+  margin-bottom: 34px;
+  background: #1c3439;
+  color: #c89295;
+  font:
+    46px Georgia,
+    serif;
+  box-shadow: inset 0 0 30px #050e17;
+}
+.broadcast-mark .status-lamp {
+  background: #cf6278;
+  box-shadow: 0 0 14px #cd5472;
+}
+.broadcast-mark > span:last-child {
+  position: absolute;
+  bottom: 32px;
+  font: 10px monospace;
+  letter-spacing: 3px;
+  color: #b5b6a1;
+}
+.broadcast-sleeve h3,
+.education-liners h3 {
+  margin: 14px 0;
+  font:
+    400 26px/1.4 Georgia,
+    'Songti SC',
+    serif;
+}
+.broadcast-sleeve p,
+.education-liners p,
+.experience-body {
+  font-size: 16px;
+  line-height: 1.9;
+}
+.education-liners > section {
+  border-bottom: 1px solid #66725e50;
+  padding-bottom: 26px;
+  margin-bottom: 28px;
+}
+.education-liners strong {
+  display: block;
+  font-size: 16px;
+  font-weight: 500;
+}
+.education-liners p {
+  color: #4f5c51;
+  margin: 16px 0 0;
+}
+.liner-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 13px;
+  padding: 10px 0;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid #394f49;
+  font-size: 14px;
+}
+.album-insert .liner-note {
+  font-size: 13px;
+  color: #65705e;
+  margin-top: 30px;
+  line-height: 1.7;
+}
+.experience-liners details {
+  border-top: 1px solid #69776155;
+}
+.experience-liners details:last-child {
+  border-bottom: 1px solid #69776155;
+}
+.experience-liners summary {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  justify-content: space-between;
+  cursor: pointer;
+  list-style: none;
+  padding: 23px 0;
+}
+.experience-liners summary::-webkit-details-marker {
+  display: none;
+}
+.experience-liners summary > svg {
+  flex-shrink: 0;
+  transition: transform 0.25s;
+}
+.experience-liners details[open] summary > svg {
+  transform: rotate(45deg);
+}
+.experience-liners summary strong {
+  display: block;
+  font:
+    500 23px/1.4 Georgia,
+    'Songti SC',
+    serif;
+  margin: 8px 0;
+}
+.experience-role {
+  font-size: 14px;
+  color: #596651;
+}
+.experience-body {
+  padding-bottom: 28px;
+}
+.experience-body p {
+  margin-top: 0;
+  color: #4b594c;
+}
+.experience-body ul {
+  padding-left: 19px;
+  margin: 15px 0;
+}
+.experience-body li {
+  padding-left: 4px;
+  margin: 12px 0;
+}
+.recognition-list > button {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+  width: 100%;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid #69776155;
+  padding: 24px 0;
+  text-align: left;
+}
+.recognition-seal {
+  width: 52px;
+  height: 52px;
+  border: 1px solid #84734e;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #766338;
+  flex-shrink: 0;
+}
+.recognition-list button > span:nth-child(2) {
+  flex: 1;
+}
+.recognition-list strong {
+  display: block;
+  font:
+    500 21px/1.5 Georgia,
+    'Songti SC',
+    serif;
+  margin: 6px 0;
+}
+.recognition-list button > span:nth-child(2) > span:last-child {
+  font-size: 14px;
+  color: #51604f;
+}
+.recognition-list button > svg {
+  flex-shrink: 0;
+}
+.insert-footer {
+  position: absolute;
+  bottom: 22px;
+  left: 32px;
+  right: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-top: 1px solid #56665055;
+  padding-top: 14px;
+  color: #58614e;
+  font: 10px monospace;
+  letter-spacing: 1px;
+}
+.album-pagination {
+  margin-top: 28px;
+}
+.album-pagination button,
+.album-pagination a {
+  min-height: 44px;
+  min-width: 40px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 0;
+  display: grid;
+  place-items: center;
+  color: #cad0bd;
+}
+.album-pagination a[aria-current] {
+  color: #81cfcb;
+  border-color: #759e946b;
+  background: #203636;
+}
+.cd-project-dialog,
+.award-dialog,
+.credits-dialog {
+  color: #e5e2d0;
+  background: #1c292d;
+  border: 1px solid #84918b85;
+  border-radius: 6px;
+  max-height: 90svh;
+  overflow-y: auto;
+  box-shadow: 0 20px 80px #0008;
+}
+.cd-project-dialog {
+  width: min(1000px, calc(100vw - 36px));
+  max-width: 1000px;
+  padding: 0;
+  gap: 0;
+}
+.cd-dialog-close {
+  position: absolute;
+  top: 13px;
+  right: 13px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  background: #122126;
+  color: #e4e4d2;
+  width: 42px;
+  height: 42px;
+  border: 1px solid #9db2a67a;
+}
+.project-dialog-heading {
+  padding: 32px 65px 27px 32px;
+}
+.project-dialog-heading .overline {
+  color: #a6c7bf;
+}
+.project-dialog-heading [data-slot='dialog-title'] {
+  font:
+    400 34px/1.3 Georgia,
+    'Songti SC',
+    serif;
+  margin: 10px 0 13px;
+  color: #e4cea7;
+}
+.cd-project-dialog [data-slot='dialog-description'],
+.award-dialog [data-slot='dialog-description'],
+.credits-dialog [data-slot='dialog-description'] {
+  color: #bdc6b9;
+  line-height: 1.8;
+  font-size: 16px;
+}
+.cd-project-dialog video {
+  width: 100%;
+  max-height: 60svh;
+  display: block;
+  background: #020a0d;
+}
+.project-dialog-copy {
+  padding: 27px 32px 30px;
+}
+.project-dialog-copy p {
+  font-size: 16px;
+  line-height: 1.9;
+  margin: 18px 0;
+  color: #d1d7c8;
+}
+.project-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.project-tags span {
+  padding: 6px 10px;
+  border: 1px solid #8da9995b;
+  font: 12px monospace;
+  color: #a7c9bf;
+}
+.cd-document-link {
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+  border-bottom: 1px solid #91b7a8;
+  padding: 10px 0;
+  color: #bedfd0;
+  font-size: 14px;
+}
+.project-dialog-copy .playback-note {
+  font-size: 13px;
+  color: #9baea4;
+  margin-bottom: 0;
+}
+.award-dialog {
+  max-width: 520px;
+  width: calc(100vw - 36px);
+  padding: 45px 35px 35px;
+  text-align: center;
+  gap: 16px;
+}
+.large-medal {
+  margin: 0 auto 9px;
+  width: 125px;
+  height: 125px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  border: 6px double #d2b578;
+  color: #4e3c22;
+  background: linear-gradient(130deg, #f2d3a1, #a98843 55%, #dac18d);
+  box-shadow: 0 9px 20px #0005;
+}
+.award-dialog .overline {
+  color: #cbb585;
+}
+.award-dialog [data-slot='dialog-title'] {
+  font:
+    400 28px/1.5 Georgia,
+    'Songti SC',
+    serif;
+}
+.award-film-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 44px;
+  border: 1px solid #b7caba75;
+  background: none;
+  color: #bde2d2;
+  margin-top: 9px;
+  font-size: 14px;
+}
+.credits-dialog {
+  max-width: 600px;
+  width: calc(100vw - 36px);
+  padding: 32px;
+}
+.credits-dialog [data-slot='dialog-title'] {
+  font:
+    400 29px Georgia,
+    'Songti SC',
+    serif;
+  margin: 12px 30px 10px 0;
+}
+.credits-dialog ul {
+  padding: 0;
+  list-style: none;
+  margin: 0;
+}
+.credits-dialog li {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 15px 0;
+  border-bottom: 1px solid #a3baa535;
+}
+.credits-dialog li > span {
+  color: #9daf9e;
+  font-size: 13px;
+}
+.credits-dialog li > a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #e8d4b1;
+  font-size: 16px;
+}
+.credits-dialog small {
+  color: #a4b5a4;
+  font-size: 12px;
+}
+@media (min-width: 1500px) {
+  .cd-cabinet {
+    left: 33%;
+    width: 34%;
+    gap: 9% 23%;
+  }
+}
+@media (max-width: 1100px) {
+  .cd-wordmark > span:last-child {
+    display: none;
+  }
+  .cd-main-nav {
+    gap: 24px;
+  }
+  .explore-help {
+    display: none;
+  }
+  .disc-side {
+    padding: 20px;
+  }
+  .album-insert {
+    padding: 24px 25px 70px;
+  }
+  .disc-cradle {
+    padding: 18px;
+  }
+  .album-tracklist {
+    grid-template-columns: 1fr;
+  }
+  .disc-side {
+    position: static;
+  }
+  .insert-footer {
+    left: 25px;
+    right: 25px;
+  }
+}
+@media (max-width: 760px) {
+  .cd-site {
+    padding: 0 16px;
+  }
+  .cd-masthead {
+    min-height: 110px;
+    flex-wrap: wrap;
+    gap: 0;
+    padding: 8px 0 0;
+  }
+  .cd-wordmark {
+    padding: 0;
+  }
+  .cd-wordmark > span:first-child {
+    font-size: 39px;
+  }
+  .cd-wordmark > span:last-child {
+    display: block;
+    font-size: 10px;
+    letter-spacing: 0.5px;
+  }
+  .cd-wordmark small {
+    display: none;
+  }
+  .cd-header-actions {
+    margin-left: auto;
+    gap: 7px;
+  }
+  .cd-header-actions button {
+    padding: 8px;
+    min-height: 38px;
+  }
+  .cd-header-actions .sound-switch span {
+    font-size: 12px;
+  }
+  .cd-main-nav {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    gap: 32px;
+  }
+  .cd-main-nav button {
+    padding: 13px 0;
+  }
+  .environment-caption {
+    min-height: 43px;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+  }
+  .environment-caption > span:nth-child(2) {
+    display: none;
+  }
+  .front .painted-stage {
+    aspect-ratio: auto;
+    height: 540px;
+  }
+  .front .painted-camera {
+    left: -55%;
+    right: -55%;
+  }
+  .front .studio-introduction {
+    max-width: none;
+    left: 27%;
+    right: 27%;
+    bottom: 5%;
+    padding: 17px;
+    text-align: center;
+  }
+  .studio-introduction h1 {
+    font-size: 25px;
+    margin: 8px 0;
+  }
+  .studio-introduction .overline {
+    font-size: 11px;
+  }
+  .studio-introduction p {
+    font-size: 13px;
+  }
+  .painted-sign strong {
+    font-size: 20px;
+  }
+  .painted-door {
+    height: 46%;
+  }
+  .door-insignia strong {
+    font-size: 18px;
+  }
+  .enter-label {
+    font-size: 14px;
+    bottom: 4%;
+    padding: 10px;
+  }
+  .sound-environment.shelf {
+    height: 200svh;
+  }
+  .explore-sticky {
+    top: 110px;
+  }
+  .shelf .painted-stage {
+    height: clamp(350px, calc(100svh - 342px), 560px);
+  }
+  .shelf .painted-camera {
+    left: -13%;
+    right: -13%;
+  }
+  .archive-title {
+    left: 25%;
+    width: 45%;
+    top: 18%;
+  }
+  .archive-title h1 {
+    font-size: 17px;
+  }
+  .archive-title .overline {
+    font-size: 9px;
+    letter-spacing: 1px;
+  }
+  .cd-cabinet {
+    top: 36%;
+    bottom: 12%;
+    left: 28%;
+    width: 38%;
+    gap: 10% 15%;
+  }
+  .case-lid {
+    padding: 9%;
+  }
+  .case-catalogue {
+    font-size: 7px;
+  }
+  .case-lid > strong {
+    font-size: 20px;
+    letter-spacing: -0.8px;
+  }
+  .case-lid > small,
+  .case-edition {
+    display: none;
+  }
+  .case-category {
+    font-size: 10px;
+  }
+  .case-edge {
+    font-size: 7px;
+  }
+  .case-lid > strong {
+    margin-bottom: 12%;
+  }
+  .wall-awards {
+    left: 72%;
+    width: 15%;
+    top: 35%;
+  }
+  .wall-awards > .overline {
+    font-size: 8px;
+    letter-spacing: 0.2px;
+  }
+  .medals-grid {
+    gap: 7px 2px;
+  }
+  .medallion {
+    width: 33px;
+    border-width: 2px;
+  }
+  .wall-medal {
+    min-width: 36px;
+    min-height: 65px;
+    padding: 0;
+  }
+  .medallion svg {
+    width: 17px;
+    height: 17px;
+  }
+  .medallion strong {
+    font-size: 9px;
+  }
+  .medal-ribbon {
+    width: 14px;
+    height: 14px;
+  }
+  .medal-date {
+    font-size: 9px;
+  }
+  .outside-button {
+    top: 12px;
+    left: 12px;
+    padding: 10px;
+    font-size: 13px;
+  }
+  .room-cue {
+    font-size: 9px;
+    bottom: 10px;
+    right: 10px;
+  }
+  .desk-hotspot {
+    left: 12%;
+    bottom: 21%;
+    padding: 8px 6px;
+    font-size: 9px;
+  }
+  .exploration-toolbar {
+    min-height: 57px;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 5px 0;
+  }
+  .exploration-toolbar nav {
+    width: 100%;
+    justify-content: space-between;
+    gap: 0;
+  }
+  .exploration-toolbar nav button {
+    padding: 10px 7px;
+    gap: 5px;
+    font-size: 13px;
+  }
+  .exploration-toolbar nav button span {
+    font-size: 10px;
+  }
+  .case-actions {
+    width: 100%;
+  }
+  .case-actions button:first-child {
+    flex: 1;
+    justify-content: center;
+  }
+  .album-shortcuts {
+    grid-template-columns: 1fr 1fr;
+  }
+  .album-shortcuts button {
+    min-height: 54px;
+    padding: 12px;
+    gap: 9px;
+  }
+  .album-shortcuts button:nth-child(2) {
+    border-right: 0;
+  }
+  .album-shortcuts button:nth-child(-n + 2) {
+    border-bottom: 1px solid #b5a17652;
+  }
+  .album-shortcuts strong {
+    font-size: 14px;
+  }
+  .album-shortcuts button > span {
+    font-size: 11px;
+  }
+  .environment-footer {
+    font-size: 11px;
+    min-height: 36px;
+  }
+  .environment-footer > span:last-child {
+    display: none;
+  }
+  .site-colophon {
+    flex-wrap: wrap;
+    padding: 16px 0;
+    gap: 10px;
+    font-size: 10px;
+  }
+  .site-colophon button {
+    padding: 10px 0;
+    font-size: 12px;
+  }
+  .site-colophon a {
+    gap: 5px;
+  }
+  .album-breadcrumb {
+    min-height: 60px;
+  }
+  .album-breadcrumb > span {
+    display: none;
+  }
+  .open-album {
+    grid-template-columns: 1fr;
+    padding: 6px;
+    gap: 8px;
+  }
+  .disc-side {
+    padding: 18px;
+  }
+  .disc-cradle {
+    width: 240px;
+    margin-top: 20px;
+    margin-bottom: 18px;
+  }
+  .disc-cradle .disc-print strong {
+    font-size: 48px;
+  }
+  .disc-caption h1 {
+    font-size: 28px;
+  }
+  .album-tracklist {
+    grid-template-columns: 1fr 1fr;
+    gap: 0 14px;
+  }
+  .album-tracklist button {
+    font-size: 13px;
+  }
+  .album-contact {
+    margin-top: 20px;
+  }
+  .album-insert {
+    min-height: 650px;
+    padding: 22px 20px 70px;
+  }
+  .album-insert h2 {
+    margin-top: 24px;
+    font-size: 30px;
+  }
+  .record-projects {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+  .record-project > strong {
+    font-size: 23px;
+  }
+  .record-summary {
+    font-size: 16px;
+  }
+  .record-type {
+    font-size: 13px;
+  }
+  .recognition-list > button {
+    gap: 12px;
+  }
+  .recognition-list strong {
+    font-size: 19px;
+  }
+  .recognition-seal {
+    width: 42px;
+    height: 42px;
+  }
+  .insert-footer {
+    left: 20px;
+    right: 20px;
+    font-size: 9px;
+  }
+  .cd-project-dialog {
+    width: calc(100vw - 20px);
+  }
+  .project-dialog-heading,
+  .project-dialog-copy {
+    padding: 24px 20px;
+  }
+  .project-dialog-heading {
+    padding-right: 60px;
+  }
+  .project-dialog-heading [data-slot='dialog-title'] {
+    font-size: 27px;
+  }
+  .credits-dialog,
+  .award-dialog {
+    padding: 35px 24px 25px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cd-site *,
+  .cd-site *::before,
+  .cd-site *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
