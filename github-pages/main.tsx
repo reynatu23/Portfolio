@@ -3,5 +3,6 @@ import Portfolio from '../app/Portfolio';
 import '../app/globals.css';
 import '../app/cd-studio.css';
 import '../app/neo-studio.css';
+import '../app/scene-refinements.css';
 
 createRoot(document.getElementById('root')!).render(<Portfolio />);

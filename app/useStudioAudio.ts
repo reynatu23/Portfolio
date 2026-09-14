@@ -90,7 +90,7 @@ export function useStudioAudio(ducked: boolean) {
         !ctx ||
         ctx.state === 'closed' ||
         effectsVolume === 0 ||
-        performance.now() - lastCue.current < 95
+        (cue !== 'award' && performance.now() - lastCue.current < 95)
       )
         return;
       lastCue.current = performance.now();

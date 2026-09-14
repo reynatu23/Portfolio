@@ -56,10 +56,13 @@ export const projects: Project[] = [
     duration: '02:59',
     tags: ['Sound Design', 'Showcase'],
     category: 'games',
-    summary: { zh: '声音设计展示。', en: 'A sound design showcase.' },
+    summary: {
+      zh: '材质、重量与混合武器的声音运动。',
+      en: 'Sonic movement through material, weight and hybrid weapons.',
+    },
     details: {
-      zh: '本页展示所提供的 Zoopunk 视频作品。',
-      en: 'This page presents the supplied Zoopunk portfolio video.',
+      zh: '爱丁堡大学毕业项目 Sounding Motion 的声音重设计案例。通过角色拟音、真实与电子引擎分层，以及不同武器的频率和重量设计，探索视觉材质如何塑造声音运动感。',
+      en: 'A sound redesign from my Edinburgh final project, Sounding Motion. Character Foley, layered physical and electronic engines, and distinct weapon weights explore how visual material shapes sonic movement.',
     },
   },
   {
@@ -69,10 +72,13 @@ export const projects: Project[] = [
     duration: '03:46',
     tags: ['Sound Design', 'Showcase'],
     category: 'games',
-    summary: { zh: '声音设计展示。', en: 'A sound design showcase.' },
+    summary: {
+      zh: '用城市环境与镜头距离组织未来追逐。',
+      en: 'A futuristic chase shaped by environment and perspective.',
+    },
     details: {
-      zh: '本页展示所提供的 Time’s Down 视频作品。',
-      en: 'This page presents the supplied Time’s Down portfolio video.',
+      zh: '爱丁堡大学毕业项目 Sounding Motion 的声音重设计案例。城市环境、飞行载具、机器人与人类拟音共同建立空间，并通过远近景切换、声像、频率和密度变化表达运动。',
+      en: 'A sound redesign from my Edinburgh final project, Sounding Motion. Urban ambience, flying vehicles, robots and human Foley establish a shared space, with distance, panning, frequency and density changes communicating movement.',
     },
   },
   {
@@ -82,10 +88,13 @@ export const projects: Project[] = [
     duration: '02:48',
     tags: ['Sound Design', 'Showcase'],
     category: 'games',
-    summary: { zh: '声音设计展示。', en: 'A sound design showcase.' },
+    summary: {
+      zh: '为枪械、技能与动作节奏留出空间。',
+      en: 'Making room for weapons, abilities and action rhythm.',
+    },
     details: {
-      zh: '本页展示所提供的 Retake–Valorant 视频作品。',
-      en: 'This page presents the supplied Retake–Valorant portfolio video.',
+      zh: '爱丁堡大学毕业项目 Sounding Motion 的声音重设计案例。通过武器频率重塑、烟雾与能量场扩张、动作 whoosh 及简单原创音乐，强化画面的速度、方向与节奏。',
+      en: 'A sound redesign from my Edinburgh final project, Sounding Motion. Reshaped weapon spectra, expanding smoke and energy fields, action whooshes and simple original music reinforce speed, direction and rhythm.',
     },
   },
   {

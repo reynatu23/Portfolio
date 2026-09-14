@@ -65,7 +65,7 @@ type Props = {
 const positions = [
   { x: 50, y: 50, s: 1 },
   { x: 14, y: 64, s: 1.75 },
-  { x: 59, y: 40, s: 1.85 },
+  { x: 58, y: 40, s: 1.85 },
   { x: 82, y: 31, s: 2.5 },
   { x: 63, y: 57, s: 1.65 },
 ];
@@ -127,10 +127,10 @@ export default function StudioScene({
     window.addEventListener('keydown', key);
     return () => window.removeEventListener('keydown', key);
   }, []);
-  function focus(n: number) {
+  function focus(n: number, audible = true) {
     if (n !== zone) {
       setZone(n);
-      onSound(n === 3 ? 'award' : n === 2 ? 'case' : 'button');
+      if (audible) onSound(n === 3 ? 'award' : n === 2 ? 'case' : 'button');
     }
   }
   const names = [
@@ -242,149 +242,153 @@ export default function StudioScene({
         <span className="room-index">STUDIO 01 / 2026</span>
       </div>
       <div className={'neo-viewport zone-' + zone}>
-        <div className="neo-camera" ref={camera}>
-          <img
-            src="/art/interior.jpg"
-            className="neo-room-image"
-            alt={tr(
-              '白色手绘录音棚，左侧调音台与挂有 CD、奖章的墙面',
-              'A white pencil-drawn recording studio with a mixing desk, wall-mounted CDs and medals',
-            )}
-            onError={() => setFailed(true)}
-          />
-          <div
-            className="acoustic-panels acoustic-panels-left"
-            aria-hidden="true"
-          >
-            <i />
-            <i />
-            <i />
-          </div>
-          <button
-            className="neo-console-target"
-            onPointerEnter={(e) => {
-              if (e.pointerType === 'mouse') focus(1);
-            }}
-            onFocus={() => focus(1)}
-            onClick={() => {
-              if (zone === 1) {
-                onSound('case');
-                onDrama();
-              } else focus(1);
-            }}
-            aria-label={tr(
-              '调音台：打开 The Bathroom 戏剧声音作品',
-              'Mixing desk: open The Bathroom theatre sound project',
-            )}
-          >
-            <span>
-              <SlidersHorizontal size={14} />
-              DRAMA / THE BATHROOM
-            </span>
-          </button>
-          <div
-            className="neo-wall-discs"
-            aria-label={tr('墙上 CD 作品收藏', 'Wall-mounted CD collection')}
-          >
-            <span className="wall-label">SELECTED WORKS</span>
-            <div>
-              {albums.map((a, i) => (
-                <button
-                  className={
-                    'neo-wall-disc' +
-                    (zone === 2 && picked === i ? ' active' : '')
-                  }
-                  key={a.word}
-                  style={{ '--disc-color': a.color } as CSSProperties}
-                  onPointerEnter={(e) => {
-                    if (e.pointerType === 'mouse') {
-                      setPicked(i);
-                      focus(2);
-                    }
-                  }}
-                  onFocus={() => {
-                    setPicked(i);
-                    focus(2);
-                  }}
-                  onClick={() => {
-                    if (zone === 2 && picked === i) {
-                      onSound('case');
-                      onRead(a.page);
-                    } else {
-                      setPicked(i);
-                      focus(2);
-                    }
-                  }}
-                  aria-label={a[lang]}
-                >
-                  <Disc title={a.word} number={a.number} color={a.color} />
-                  <span>{a.number}</span>
-                </button>
-              ))}
+        <div className="neo-stage">
+          <div className="neo-camera" ref={camera}>
+            <img
+              src="/art/interior.jpg"
+              className="neo-room-image"
+              alt={tr(
+                '白色手绘录音棚，左侧调音台与挂有 CD、奖章的墙面',
+                'A white pencil-drawn recording studio with a mixing desk, wall-mounted CDs and medals',
+              )}
+              onError={() => setFailed(true)}
+            />
+            <div
+              className="acoustic-panels acoustic-panels-left"
+              aria-hidden="true"
+            >
+              <i />
+              <i />
+              <i />
             </div>
-          </div>
-          <div className="neo-medal-wall">
-            <span className="wall-label">RECOGNITION</span>
-            <div>
-              {awards.map((a, i) => (
-                <button
-                  key={a.name.en}
-                  className={
-                    'neo-medal' + (zone === 3 && medal === i ? ' active' : '')
-                  }
-                  onPointerEnter={(e) => {
-                    if (e.pointerType === 'mouse') {
-                      setMedal(i);
-                      focus(3);
+            <button
+              className="neo-console-target"
+              onPointerEnter={(e) => {
+                if (e.pointerType === 'mouse') focus(1);
+              }}
+              onFocus={() => focus(1)}
+              onClick={() => {
+                if (zone === 1) {
+                  onSound('case');
+                  onDrama();
+                } else focus(1);
+              }}
+              aria-label={tr(
+                '调音台：打开 The Bathroom 戏剧声音作品',
+                'Mixing desk: open The Bathroom theatre sound project',
+              )}
+            >
+              <span>
+                <SlidersHorizontal size={14} />
+                DRAMA / THE BATHROOM
+              </span>
+            </button>
+            <div
+              className="neo-wall-discs"
+              aria-label={tr('墙上 CD 作品收藏', 'Wall-mounted CD collection')}
+            >
+              <span className="wall-label">SELECTED WORKS</span>
+              <div>
+                {albums.map((a, i) => (
+                  <button
+                    className={
+                      'neo-wall-disc' +
+                      (zone === 2 && picked === i ? ' active' : '')
                     }
-                  }}
-                  onFocus={() => {
-                    setMedal(i);
-                    focus(3);
-                  }}
-                  onClick={() => {
-                    if (zone === 3 && medal === i) {
-                      onSound('award');
-                      onAward(i);
-                    } else {
-                      setMedal(i);
-                      focus(3);
-                    }
-                  }}
-                  aria-label={a.name[lang]}
-                >
-                  <span
-                    className="medal-sprite"
-                    style={{
-                      backgroundPosition: [
-                        '0% 0%',
-                        '100% 0%',
-                        '0% 100%',
-                        '100% 100%',
-                      ][i],
+                    key={a.word}
+                    style={{ '--disc-color': a.color } as CSSProperties}
+                    onPointerEnter={(e) => {
+                      if (e.pointerType === 'mouse') {
+                        setPicked(i);
+                        focus(2);
+                      }
                     }}
-                  />
-                  <span className="medal-year">{a.year}</span>
-                </button>
-              ))}
+                    onFocus={() => {
+                      setPicked(i);
+                      focus(2);
+                    }}
+                    onClick={() => {
+                      if (zone === 2 && picked === i) {
+                        onSound('case');
+                        onRead(a.page);
+                      } else {
+                        setPicked(i);
+                        focus(2);
+                      }
+                    }}
+                    aria-label={a[lang]}
+                  >
+                    <Disc title={a.word} number={a.number} color={a.color} />
+                    <span>{a.number}</span>
+                  </button>
+                ))}
+              </div>
             </div>
+            <div className="neo-medal-wall">
+              <span className="wall-label">RECOGNITION</span>
+              <div>
+                {awards.map((a, i) => (
+                  <button
+                    key={a.name.en}
+                    className={
+                      'neo-medal' + (zone === 3 && medal === i ? ' active' : '')
+                    }
+                    onPointerEnter={(e) => {
+                      if (e.pointerType === 'mouse') {
+                        setMedal(i);
+                        focus(3, false);
+                        onSound('award');
+                      }
+                    }}
+                    onFocus={() => {
+                      setMedal(i);
+                      focus(3, false);
+                      onSound('award');
+                    }}
+                    onClick={() => {
+                      if (zone === 3 && medal === i) {
+                        onSound('award');
+                        onAward(i);
+                      } else {
+                        setMedal(i);
+                        focus(3);
+                      }
+                    }}
+                    aria-label={a.name[lang]}
+                  >
+                    <span
+                      className="medal-sprite"
+                      style={{
+                        backgroundPosition: [
+                          '0% 0%',
+                          '100% 0%',
+                          '0% 100%',
+                          '100% 100%',
+                        ][i],
+                      }}
+                    />
+                    <span className="medal-year">{a.year}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+            <button
+              className="neo-experience-target"
+              onPointerEnter={(e) => {
+                if (e.pointerType === 'mouse') focus(4);
+              }}
+              onFocus={() => focus(4)}
+              onClick={() => {
+                if (zone === 4) {
+                  onSound('case');
+                  onRead(4);
+                } else focus(4);
+              }}
+            >
+              <span>PERSONAL NOTES</span>
+              <strong>{tr('过往经历', 'Experience')}</strong>
+            </button>
           </div>
-          <button
-            className="neo-experience-target"
-            onPointerEnter={(e) => {
-              if (e.pointerType === 'mouse') focus(4);
-            }}
-            onFocus={() => focus(4)}
-            onClick={() => {
-              if (zone === 4) {
-                onSound('case');
-                onRead(4);
-              } else focus(4);
-            }}
-          >
-            <span>PERSONAL NOTES</span>
-            <strong>{tr('过往经历', 'Experience')}</strong>
-          </button>
         </div>
         <button
           className="neo-reset"

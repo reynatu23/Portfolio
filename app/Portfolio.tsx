@@ -7,7 +7,6 @@ import {
   ArrowUpRight,
   Award,
   Disc3,
-  FileText,
   Mail,
   Play,
   Plus,
@@ -29,6 +28,7 @@ import {
 import StudioScene, { albums } from './StudioScene';
 import Disc from './Disc';
 import AudioPanel from './AudioPanel';
+import DescriptionReader from './DescriptionReader';
 import { useStudioAudio } from './useStudioAudio';
 import {
   awards,
@@ -566,21 +566,11 @@ export default function Portfolio() {
                 {selected.details[lang].split('\n').map((p) => (
                   <p key={p}>{p}</p>
                 ))}
-                {selected.pdf && (
-                  <a
-                    className="cd-document-link"
-                    href={'/documents/' + selected.id + '.pdf'}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    <FileText size={17} />
-                    {tr(
-                      '阅读原始作品说明 · PDF',
-                      'Read the original work description · PDF',
-                    )}
-                    <ArrowUpRight size={16} />
-                  </a>
-                )}
+                <DescriptionReader
+                  key={selected.id}
+                  id={selected.id}
+                  lang={lang}
+                />
                 <p className="playback-note">
                   {tr(
                     '网页提供立体声试听版本，建议佩戴耳机。',

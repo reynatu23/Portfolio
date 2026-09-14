@@ -1,0 +1,82 @@
+/* Preserve the artwork's proportions at every screen and camera size. */
+.neo-viewport {
+  container-type: size;
+  height: clamp(300px, calc(100svh - 265px), 850px);
+  min-height: 0;
+  max-height: none;
+  aspect-ratio: auto;
+  background: #f5f4ee;
+}
+.neo-stage {
+  position: absolute;
+  width: min(100cqw, 177.68cqh);
+  height: min(56.28cqw, 100cqh);
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+.neo-camera {
+  width: 100%;
+  height: 100%;
+}
+.neo-wall-discs {
+  left: 48%;
+  top: 26%;
+  width: 19%;
+}
+.neo-wall-discs > div {
+  gap: clamp(10px, 1.4cqw, 24px);
+  padding: 4%;
+}
+.neo-wall-disc {
+  padding: 6%;
+}
+.description-reader {
+  margin: 24px 0;
+}
+.description-pages {
+  background: #fffef9;
+  color: #303630;
+  padding: clamp(20px, 4vw, 45px);
+  border: 1px solid #c9cdc2;
+  margin-top: 18px;
+}
+.description-pages header {
+  border-bottom: 1px solid #c9cdc2;
+  padding-bottom: 18px;
+  margin-bottom: 22px;
+}
+.description-pages header span {
+  font: 11px monospace;
+  letter-spacing: 2px;
+  color: #657261;
+}
+.description-pages h3 {
+  margin: 8px 0 0;
+  font-size: 24px;
+  color: #27332b;
+}
+.project-dialog-copy .description-pages p {
+  color: #343d35;
+  font-size: 16px;
+  line-height: 1.9;
+  white-space: pre-line;
+  margin: 0 0 24px;
+  max-width: 70ch;
+}
+@media (max-width: 760px) {
+  .neo-wall-discs {
+    left: 47%;
+    width: 21%;
+  }
+  .neo-viewport {
+    height: 350px;
+  }
+  .neo-object-note.overview-note {
+    bottom: 6px;
+    padding: 7px 10px;
+  }
+  .description-pages {
+    padding: 20px;
+  }
+}
