@@ -1,6 +1,6 @@
 'use client';
 /* eslint-disable next/no-img-element -- Portfolio posters are local pre-sized JPEG assets. */
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   ArrowLeft,
   ArrowRight,
@@ -11,8 +11,6 @@ import {
   Mail,
   Play,
   Plus,
-  Volume2,
-  VolumeX,
   X,
 } from 'lucide-react';
 import {
@@ -30,7 +28,8 @@ import {
 } from '@/components/ui/pagination';
 import StudioScene, { albums } from './StudioScene';
 import Disc from './Disc';
-import { soundFiles, type SoundCue } from './audio';
+import AudioPanel from './AudioPanel';
+import { useStudioAudio } from './useStudioAudio';
 import {
   awards,
   chapters,
@@ -42,28 +41,10 @@ import {
 
 const credits = [
   {
-    cue: { zh: '推门', en: 'Door' },
-    name: 'dorm door opening.wav',
-    author: 'pagancow',
-    url: 'https://freesound.org/people/pagancow/sounds/15419/',
-  },
-  {
-    cue: { zh: '打开 CD 盒', en: 'CD case' },
-    name: 'cd case.wav',
-    author: 'jrssandoval',
-    url: 'https://freesound.org/people/jrssandoval/sounds/67134/',
-  },
-  {
-    cue: { zh: '切换与选择', en: 'Navigation' },
-    name: 'Button Tick',
-    author: 'NenadSimic',
-    url: 'https://freesound.org/people/NenadSimic/sounds/268108/',
-  },
-  {
-    cue: { zh: '奖章', en: 'Awards' },
-    name: 'success_bell',
-    author: 'MLaudio',
-    url: 'https://freesound.org/people/MLaudio/sounds/511484/',
+    cue: { zh: '背景音乐', en: 'Background music' },
+    name: 'Airport Lounge',
+    author: 'Kevin MacLeod (incompetech.com)',
+    url: 'https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100806',
   },
 ];
 
@@ -74,75 +55,13 @@ export default function Portfolio() {
   const [selected, setSelected] = useState<Project | null>(null);
   const [awardIndex, setAwardIndex] = useState<number | null>(null);
   const [creditsOpen, setCreditsOpen] = useState(false);
-  const [sound, setSound] = useState(false);
-  const [loadingSound, setLoadingSound] = useState(false);
-  const [audioError, setAudioError] = useState(false);
   const [videoError, setVideoError] = useState(false);
-  const audio = useRef<AudioContext | null>(null);
-  const buffers = useRef<Partial<Record<SoundCue, AudioBuffer>>>({});
-  const sources = useRef(new Set<AudioBufferSourceNode>());
+  const audio = useStudioAudio(selected !== null);
+  const { sound, playSound } = audio;
   const tr = (zh: string, en: string) => (lang === 'zh' ? zh : en);
   useEffect(() => {
     document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
   }, [lang]);
-  useEffect(
-    () => () => {
-      void audio.current?.close();
-    },
-    [],
-  );
-  const playSound = useCallback(
-    (cue: SoundCue = 'button') => {
-      const ctx = audio.current,
-        buffer = buffers.current[cue];
-      if (!sound || !ctx || !buffer) return;
-      void ctx.resume();
-      const source = ctx.createBufferSource();
-      source.buffer = buffer;
-      source.connect(ctx.destination);
-      sources.current.add(source);
-      source.onended = () => {
-        sources.current.delete(source);
-        source.disconnect();
-      };
-      source.start();
-    },
-    [sound],
-  );
-  async function toggleSound() {
-    if (loadingSound) return;
-    setAudioError(false);
-    if (sound) {
-      sources.current.forEach((s) => s.stop());
-      sources.current.clear();
-      setSound(false);
-      return;
-    }
-    setLoadingSound(true);
-    try {
-      const ctx = audio.current ?? new AudioContext();
-      audio.current = ctx;
-      await ctx.resume();
-      await Promise.all(
-        (Object.entries(soundFiles) as [SoundCue, string][]).map(
-          async ([cue, url]) => {
-            if (buffers.current[cue]) return;
-            const response = await fetch(url);
-            if (!response.ok) throw new Error('Audio unavailable');
-            buffers.current[cue] = await ctx.decodeAudioData(
-              await response.arrayBuffer(),
-            );
-          },
-        ),
-      );
-      setSound(true);
-    } catch {
-      setAudioError(true);
-      setSound(false);
-    } finally {
-      setLoadingSound(false);
-    }
-  }
   function switchView(next: 'front' | 'shelf') {
     setView(next);
     setSelected(null);
@@ -253,18 +172,7 @@ export default function Portfolio() {
           </button>
         </nav>
         <div className="cd-header-actions">
-          <button
-            className="sound-switch"
-            aria-pressed={sound}
-            disabled={loadingSound}
-            onClick={() => void toggleSound()}
-          >
-            {sound ? <Volume2 size={16} /> : <VolumeX size={16} />}
-            <span>
-              {loadingSound ? tr('载入中', 'Loading') : tr('交互音效', 'Sound')}{' '}
-              {sound ? 'ON' : 'OFF'}
-            </span>
-          </button>
+          <AudioPanel audio={audio} lang={lang} />
           <button
             className="language-switch"
             onClick={() => {
@@ -279,14 +187,7 @@ export default function Portfolio() {
           </button>
         </div>
       </header>
-      {audioError && (
-        <output className="cd-audio-error">
-          {tr(
-            '音效暂时无法加载，可再次点击开关重试。',
-            'Sound could not load. Toggle it again to retry.',
-          )}
-        </output>
-      )}
+
       <main id="main-content">
         {view !== 'reader' ? (
           <StudioScene
@@ -297,6 +198,9 @@ export default function Portfolio() {
             onRead={read}
             onSound={playSound}
             onAward={setAwardIndex}
+            onDrama={() =>
+              openProject(projects.find((p) => p.id === 'bathroom')!)
+            }
             sound={sound}
           />
         ) : (
@@ -603,7 +507,7 @@ export default function Portfolio() {
       <footer className="site-colophon">
         <span>© 2026 CHONGTING TU</span>
         <button onClick={() => setCreditsOpen(true)}>
-          {tr('交互音效来源', 'Sound credits')}
+          {tr('音乐与音效来源', 'Sound credits')}
         </button>
         <a href="mailto:reyna.tu@outlook.com">
           LET’S TALK
@@ -703,9 +607,18 @@ export default function Portfolio() {
               >
                 <X size={21} />
               </DialogClose>
-              <div className="large-medal">
-                <Award size={58} />
-              </div>
+              <div
+                className="award-art"
+                aria-hidden="true"
+                style={{
+                  backgroundPosition: [
+                    '0% 0%',
+                    '100% 0%',
+                    '0% 100%',
+                    '100% 100%',
+                  ][awardIndex ?? 0],
+                }}
+              />
               <span className="overline">RECOGNITION / {award.year}</span>
               <DialogTitle>{award.name[lang]}</DialogTitle>
               <DialogDescription>{award.note[lang]}</DialogDescription>
@@ -734,12 +647,12 @@ export default function Portfolio() {
             <X size={21} />
           </DialogClose>
           <DialogTitle>
-            {tr('交互音效来源', 'Interaction sound credits')}
+            {tr('音乐与音效来源', 'Music & sound credits')}
           </DialogTitle>
           <DialogDescription>
             {tr(
-              '界面使用以下 Freesound 素材，经剪辑、滤波与音量调整。音效默认关闭，可从顶部开启。',
-              'Interface sounds use the following Freesound recordings, edited, filtered and level-adjusted. Sound is off until you enable it.',
+              '背景音乐为 Kevin MacLeod 的 Airport Lounge，按 CC BY 4.0 许可使用，已转换为网页试听格式。交互音效为本网站合成的柔和电子音。音乐与音效均可独立控制。',
+              'Background music: Airport Lounge by Kevin MacLeod, licensed under CC BY 4.0 and encoded for web playback. Interface sounds are soft electronic tones synthesized for this website. Music and effects have separate controls.',
             )}
           </DialogDescription>
           <ul>
@@ -750,17 +663,17 @@ export default function Portfolio() {
                   {c.name}
                   <ArrowUpRight size={15} />
                 </a>
-                <small>{c.author} / CC0</small>
+                <small>{c.author} / CC BY 4.0</small>
               </li>
             ))}
           </ul>
           <a
             className="cd-document-link"
-            href="https://creativecommons.org/publicdomain/zero/1.0/"
+            href="https://creativecommons.org/licenses/by/4.0/"
             target="_blank"
             rel="noreferrer"
           >
-            Creative Commons CC0 1.0
+            Creative Commons Attribution 4.0
             <ArrowUpRight size={15} />
           </a>
         </DialogContent>

@@ -16,10 +16,10 @@
 }
 :root,
 .dark {
-  --background: #141b1c;
-  --foreground: #ede7d8;
-  --popover: #20282a;
-  --accent: #77cbcc;
+  --background: #0c1122;
+  --foreground: #eef3ff;
+  --popover: #151d35;
+  --accent: #5decf2;
   --radius: 6px;
 }
 * {

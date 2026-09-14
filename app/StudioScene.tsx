@@ -1,15 +1,13 @@
 'use client';
-/* eslint-disable next/no-img-element -- Pre-sized original paintings are mapped to interactive scene coordinates. */
+/* eslint-disable next/no-img-element -- Original scene artwork is aligned with interactive wall objects. */
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import {
   ArrowLeft,
-  ArrowRight,
   ArrowUpRight,
-  Award,
   Disc3,
-  Headphones,
-  Mouse,
-  X,
+  Focus,
+  MousePointer2,
+  SlidersHorizontal,
 } from 'lucide-react';
 import gsap from 'gsap';
 import Disc from './Disc';
@@ -22,7 +20,7 @@ export const albums = [
     zh: '游戏与动画',
     en: 'Games & animation',
     word: 'PLAY',
-    color: '#66c6c7',
+    color: '#52e5ed',
     number: '01',
     subtitle: 'INTERACTIVE WORLDS',
   },
@@ -31,7 +29,7 @@ export const albums = [
     zh: '影视与戏剧',
     en: 'Film & theatre',
     word: 'FRAME',
-    color: '#dc8b68',
+    color: '#fb64ca',
     number: '02',
     subtitle: 'SOUND & NARRATIVE',
   },
@@ -40,7 +38,7 @@ export const albums = [
     zh: '广播电视',
     en: 'Broadcast',
     word: 'ON AIR',
-    color: '#d6be7b',
+    color: '#d3fa57',
     number: '03',
     subtitle: 'THE LIVE MOMENT',
   },
@@ -49,7 +47,7 @@ export const albums = [
     zh: '过往经历',
     en: 'Experience',
     word: 'NOTES',
-    color: '#d98faf',
+    color: '#8c9fff',
     number: '04',
     subtitle: 'LEARNING & MAKING',
   },
@@ -57,427 +55,309 @@ export const albums = [
 type Props = {
   lang: Lang;
   view: 'front' | 'shelf';
-  onView: (view: 'front' | 'shelf') => void;
+  onView: (v: 'front' | 'shelf') => void;
   onRead: (page: number) => void;
   onSound: (cue?: SoundCue) => void;
-  onAward: (index: number) => void;
+  onAward: (i: number) => void;
+  onDrama: () => void;
   sound: boolean;
 };
-
+const positions = [
+  { x: 50, y: 50, s: 1 },
+  { x: 38, y: 62, s: 1.75 },
+  { x: 62, y: 33, s: 2.55 },
+  { x: 82, y: 31, s: 2.5 },
+  { x: 74, y: 64, s: 1.65 },
+];
 export default function StudioScene({
   lang,
   view,
-  onView,
   onRead,
   onSound,
   onAward,
-  sound,
+  onDrama,
 }: Props) {
-  const [picked, setPicked] = useState<number | null>(null);
-  const [opening, setOpening] = useState(false);
-  const [entering, setEntering] = useState(false);
-  const [zone, setZone] = useState(0);
-  const [imageError, setImageError] = useState(false);
-  const scene = useRef<HTMLDivElement>(null);
-  const canvas = useRef<HTMLDivElement>(null);
-  const scrollRoot = useRef<HTMLElement>(null);
-  const transition = useRef<gsap.core.Timeline | null>(null);
-  const meter = useRef<HTMLDivElement>(null);
+  const [zone, setZone] = useState(view === 'shelf' ? 2 : 0),
+    [picked, setPicked] = useState(0),
+    [medal, setMedal] = useState(0);
+  const [failed, setFailed] = useState(false);
+  const camera = useRef<HTMLDivElement>(null);
   const tr = (zh: string, en: string) => (lang === 'zh' ? zh : en);
-  useEffect(
-    () => () => {
-      transition.current?.kill();
-    },
-    [],
-  );
   useEffect(() => {
-    if (view !== 'shelf') return;
-    let raf = 0;
-    const update = () => {
-      raf = 0;
-      if (!scrollRoot.current || !canvas.current) return;
-      const rect = scrollRoot.current.getBoundingClientRect();
-      const travel = Math.max(1, rect.height - window.innerHeight + 100);
-      const progress = Math.max(0, Math.min(1, (100 - rect.top) / travel));
-      const stops = [
-        { s: 1, x: 50, y: 50 },
-        { s: 1.6, x: 13, y: 72 },
-        { s: 1.3, x: 50, y: 44 },
-        { s: 1.75, x: 87, y: 38 },
-      ];
-      const f = progress * 3,
-        n = Math.min(2, Math.floor(f)),
-        t = f - n;
-      const mix = (a: number, b: number) => a + (b - a) * t;
-      const reduced = window.matchMedia(
-        '(prefers-reduced-motion: reduce)',
-      ).matches;
-      canvas.current.style.transform = reduced
-        ? 'none'
-        : `scale(${mix(stops[n].s, stops[n + 1].s)})`;
-      canvas.current.style.transformOrigin = `${mix(stops[n].x, stops[n + 1].x)}% ${mix(stops[n].y, stops[n + 1].y)}%`;
-      if (meter.current) meter.current.style.width = `${progress * 100}%`;
-      setZone(Math.round(f));
-    };
-    const schedule = () => {
-      if (!raf) raf = requestAnimationFrame(update);
-    };
-    window.addEventListener('scroll', schedule, { passive: true });
-    window.addEventListener('resize', schedule);
-    schedule();
+    const p = positions[zone],
+      reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const limit = (p.s - 1) * 50,
+      clamp = (v: number) => Math.max(-limit, Math.min(limit, v));
+    const animation = gsap.to(camera.current, {
+      scale: reduced ? 1 : p.s,
+      xPercent: reduced ? 0 : clamp((50 - p.x) * p.s),
+      yPercent: reduced ? 0 : clamp((50 - p.y) * p.s),
+      duration: reduced ? 0 : 0.85,
+      ease: 'power3.inOut',
+      overwrite: true,
+    });
     return () => {
-      window.removeEventListener('scroll', schedule);
-      window.removeEventListener('resize', schedule);
-      cancelAnimationFrame(raf);
+      animation.kill();
     };
-  }, [view]);
+  }, [zone]);
   useEffect(() => {
     const key = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        transition.current?.kill();
-        setPicked(null);
-        setOpening(false);
-        setEntering(false);
-        if (scene.current) gsap.set(scene.current, { opacity: 1, scale: 1 });
-      }
+      if (e.key === 'Escape') setZone(0);
     };
     window.addEventListener('keydown', key);
     return () => window.removeEventListener('keydown', key);
   }, []);
-  function jump(n: number) {
-    if (!scrollRoot.current) return;
-    onSound('button');
-    const top =
-      scrollRoot.current.getBoundingClientRect().top + window.scrollY - 100;
-    const travel = scrollRoot.current.offsetHeight - window.innerHeight + 100;
-    window.scrollTo({
-      top: Math.max(0, top + (travel * n) / 3),
-      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
-        ? 'instant'
-        : 'smooth',
-    });
-  }
-  function enter() {
-    if (entering) return;
-    setEntering(true);
-    onSound('door');
-    const reduced = window.matchMedia(
-      '(prefers-reduced-motion: reduce)',
-    ).matches;
-    transition.current = gsap
-      .timeline({ onComplete: () => onView('shelf') })
-      .to(scene.current, {
-        scale: reduced ? 1 : 2.3,
-        opacity: 0,
-        duration: reduced ? 0.1 : 1,
-        ease: 'power3.inOut',
-      });
-  }
-  function pick(i: number) {
-    if (opening) return;
-    if (picked === i) {
-      read(i);
-      return;
+  function focus(n: number) {
+    if (n !== zone) {
+      setZone(n);
+      onSound('button');
     }
-    onSound('case');
-    setPicked(i);
   }
-  function read(i: number) {
-    if (opening) return;
-    onSound('case');
-    setOpening(true);
-    transition.current = gsap
-      .timeline({ onComplete: () => onRead(albums[i].page) })
-      .to(
-        {},
-        {
-          duration: window.matchMedia('(prefers-reduced-motion: reduce)')
-            .matches
-            ? 0.05
-            : 0.65,
-        },
-      );
+  const names = [
+    tr('全景', 'Overview'),
+    tr('调音台', 'Mixing desk'),
+    tr('墙上 CD', 'CD wall'),
+    tr('奖章', 'Awards'),
+    tr('过往经历', 'Experience'),
+  ];
+  const descriptions = [
+    tr(
+      '移动到物件，靠近探索。点击打开作品。',
+      'Move to an object to look closer. Click to open.',
+    ),
+    tr(
+      '舞台上的情绪，也可以由声音讲述。',
+      'Sound carries the emotion of a stage performance.',
+    ),
+    albums[picked][lang],
+    awards[medal].name[lang],
+    tr('从录音棚到游戏引擎。', 'From the recording studio to the game engine.'),
+  ];
+  function open() {
+    onSound(zone === 3 ? 'award' : 'case');
+    if (zone === 1) onDrama();
+    if (zone === 2) onRead(albums[picked].page);
+    if (zone === 3) onAward(medal);
+    if (zone === 4) onRead(4);
   }
   return (
-    <section className={'sound-environment ' + view} ref={scrollRoot}>
-      <div className={view === 'shelf' ? 'explore-sticky' : ''}>
-        <div className="environment-caption">
-          <span>CHONGTING TU / REYNA</span>
-          <span>
-            {tr(
-              '声音、画面与记忆的收藏室',
-              'A COLLECTION OF SOUND, IMAGE & MEMORY',
-            )}
-          </span>
-          <span>VOL. 2026</span>
+    <section className="neo-studio">
+      <div className="neo-room-heading">
+        <div>
+          <span>SOUND DESIGN / CHONGTING TU</span>
+          <h1>{tr('在声音的房间里。', 'A room for sound.')}</h1>
         </div>
-        <div className="painted-stage" ref={scene}>
-          <div className="painted-camera" ref={canvas}>
-            <img
-              className="painted-room"
-              src={
-                '/art/' +
-                (view === 'front' ? 'exterior-oil' : 'interior-oil') +
-                '.png'
-              }
-              alt={tr(
-                view === 'front'
-                  ? '金色灯光与深蓝阴影中的油画声音工作室'
-                  : '带有调音台、CD 收藏和奖章墙的油画录音棚',
-                view === 'front'
-                  ? 'An oil-painted sound studio in amber light and deep blue shadows'
-                  : 'An oil-painted recording studio with a mixing desk, CD collection and award wall',
-              )}
-              onError={() => setImageError(true)}
-            />
-            {view === 'front' ? (
-              <>
-                <div className="painted-sign">
-                  <span>REYNA TU’S</span>
-                  <strong>SOUND STUDIO</strong>
-                </div>
-                <button
-                  className="painted-door"
-                  onClick={enter}
-                  aria-label={tr(
-                    '推门进入录音棚',
-                    'Enter the recording studio',
-                  )}
-                >
-                  <span className="door-insignia">
-                    <Headphones size={28} />
-                    <strong>
-                      LISTEN
-                      <br />
-                      CLOSELY.
-                    </strong>
-                  </span>
-                  <span className="enter-label">
-                    {tr('推门，进入声音', 'Step inside')}
-                    <ArrowUpRight size={16} />
-                  </span>
-                </button>
-                <div className="studio-introduction">
-                  <span className="overline">SOUND DESIGNER / 涂翀霆</span>
-                  <h1>{tr('让故事，被听见。', 'Stories, made audible.')}</h1>
-                  <p>
-                    {tr(
-                      '游戏 · 动画 · 影视与戏剧',
-                      'Games · Animation · Film & theatre',
-                    )}
-                  </p>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="archive-title">
-                  <span className="overline">THE LISTENING ROOM</span>
-                  <h1>
-                    {tr(
-                      '选一张 CD，听一段故事。',
-                      'Choose a disc. Enter a story.',
-                    )}
-                  </h1>
-                </div>
-                <div
-                  className={
-                    'cd-cabinet' +
-                    (picked !== null ? ' has-picked' : '') +
-                    (opening ? ' case-opening' : '')
-                  }
-                >
-                  {albums.map((a, i) => (
-                    <button
-                      key={a.word}
-                      className={'jewel-case' + (picked === i ? ' picked' : '')}
-                      style={{ '--album-color': a.color } as CSSProperties}
-                      onClick={() => pick(i)}
-                      aria-pressed={picked === i}
-                      aria-label={
-                        (picked === i
-                          ? tr('打开 ', 'Open ')
-                          : tr('取出 ', 'Select ')) + a[lang]
-                      }
-                    >
-                      <div className="case-tray">
-                        <Disc
-                          number={a.number}
-                          title={a.subtitle}
-                          color={a.color}
-                        />
-                      </div>
-                      <div className="case-lid">
-                        <span className="case-catalogue">
-                          CT / {a.number} / AUDIO
-                        </span>
-                        <strong>{a.word}</strong>
-                        <span className="case-line" />
-                        <span className="case-category">{a[lang]}</span>
-                        <small>{a.subtitle}</small>
-                        <span className="case-edition">
-                          CHONGTING TU · 2026
-                        </span>
-                      </div>
-                      <span className="case-edge">
-                        {a.word} — {a.number}
-                      </span>
-                    </button>
-                  ))}
-                  <div className="cabinet-shelf first" />
-                  <div className="cabinet-shelf second" />
-                </div>
-                <div className="wall-awards">
-                  <span className="overline">RECOGNITION</span>
-                  <div className="medals-grid">
-                    {awards.map((a, i) => (
-                      <button
-                        className="wall-medal"
-                        key={i}
-                        onClick={() => {
-                          onSound('award');
-                          onAward(i);
-                        }}
-                        aria-label={a.name[lang]}
-                      >
-                        <span className="medal-ribbon" />
-                        <span className="medallion">
-                          <Award size={23} />
-                          <strong>{['II', 'III', '10', 'III'][i]}</strong>
-                        </span>
-                        <span className="medal-date">{a.year}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <button
-                  className="desk-hotspot"
-                  aria-label={tr('近看调音台', 'Explore the mixing desk')}
-                  onClick={() => jump(1)}
-                >
-                  <span>
-                    01 / {tr('调音台', 'MIXING DESK')}{' '}
-                    <ArrowUpRight size={12} />
-                  </span>
-                </button>
-              </>
+        <span className="room-index">STUDIO 01 / 2026</span>
+      </div>
+      <div className={'neo-viewport zone-' + zone}>
+        <div className="neo-camera" ref={camera}>
+          <img
+            src="/art/neon-studio.png"
+            className="neo-room-image"
+            alt={tr(
+              '蓝白色未来录音棚，窗边调音台与挂有 CD、奖章的墙面',
+              'A blue-and-white recording studio with a mixing desk, wall-mounted CDs and medals',
             )}
-          </div>
-          {view === 'shelf' && (
-            <>
-              <button
-                className="outside-button"
-                onClick={() => onView('front')}
-              >
-                <ArrowLeft size={16} />
-                {tr('回到门外', 'Back outside')}
-              </button>
-              <div className="room-cue">
-                <span className="status-lamp" />
-                {
-                  [
-                    'STUDIO / OVERVIEW',
-                    '01 / THE MIXING DESK',
-                    '02 / THE CD ARCHIVE',
-                    '03 / THE AWARD WALL',
-                  ][zone]
-                }
-              </div>
-            </>
-          )}
-          {imageError && (
-            <output className="image-fallback">
-              {tr(
-                '画面暂时无法加载，请使用下方分类浏览。',
-                'The artwork could not load. Browse using the categories below.',
-              )}
-            </output>
-          )}
-        </div>
-        {view === 'shelf' ? (
-          <>
-            <div className="exploration-toolbar">
-              <nav aria-label={tr('探索录音棚', 'Explore the studio')}>
-                {[
-                  tr('全景', 'Overview'),
-                  tr('调音台', 'Console'),
-                  tr('CD 收藏', 'CDs'),
-                  tr('奖章墙', 'Awards'),
-                ].map((n, i) => (
-                  <button
-                    key={n}
-                    aria-current={zone === i ? 'step' : undefined}
-                    onClick={() => jump(i)}
-                  >
-                    <span>0{i}</span>
-                    {n}
-                  </button>
-                ))}
-              </nav>
-              {picked !== null ? (
-                <div className="case-actions">
-                  <button onClick={() => read(picked)}>
-                    {tr('打开', 'Open')} {albums[picked][lang]}
-                    <ArrowRight size={16} />
-                  </button>
-                  <button
-                    onClick={() => {
-                      setPicked(null);
-                      setOpening(false);
-                      onSound('case');
-                    }}
-                    aria-label={tr('放回 CD', 'Return CD')}
-                  >
-                    <X size={16} />
-                  </button>
-                </div>
-              ) : (
-                <span className="explore-help">
-                  <Mouse size={14} />
-                  {tr(
-                    '向下滚动，靠近声音的细节',
-                    'Scroll to explore the details',
-                  )}
-                </span>
-              )}
-            </div>
-            <div className="exploration-progress">
-              <div ref={meter} />
-            </div>
-          </>
-        ) : null}
-        <nav
-          className="album-shortcuts"
-          aria-label={tr('作品与经历分类', 'Portfolio and experience')}
-        >
-          {albums.map((a) => (
-            <button
-              key={a.word}
-              onClick={() => {
+            onError={() => setFailed(true)}
+          />
+          <button
+            className="neo-console-target"
+            onPointerEnter={(e) => {
+              if (e.pointerType === 'mouse') focus(1);
+            }}
+            onFocus={() => focus(1)}
+            onClick={() => {
+              if (zone === 1) {
                 onSound('case');
-                onRead(a.page);
-              }}
-            >
-              <span>{a.number}</span>
-              <strong>{a[lang]}</strong>
-              <ArrowUpRight size={18} />
+                onDrama();
+              } else focus(1);
+            }}
+            aria-label={tr(
+              '调音台：打开 The Bathroom 戏剧声音作品',
+              'Mixing desk: open The Bathroom theatre sound project',
+            )}
+          >
+            <span>
+              <SlidersHorizontal size={14} />
+              DRAMA / THE BATHROOM
+            </span>
+          </button>
+          <div
+            className="neo-wall-discs"
+            aria-label={tr('墙上 CD 作品收藏', 'Wall-mounted CD collection')}
+          >
+            <span className="wall-label">SELECTED WORKS</span>
+            <div>
+              {albums.map((a, i) => (
+                <button
+                  className={
+                    'neo-wall-disc' +
+                    (zone === 2 && picked === i ? ' active' : '')
+                  }
+                  key={a.word}
+                  style={{ '--disc-color': a.color } as CSSProperties}
+                  onPointerEnter={(e) => {
+                    if (e.pointerType === 'mouse') {
+                      setPicked(i);
+                      focus(2);
+                    }
+                  }}
+                  onFocus={() => {
+                    setPicked(i);
+                    focus(2);
+                  }}
+                  onClick={() => {
+                    if (zone === 2 && picked === i) {
+                      onSound('case');
+                      onRead(a.page);
+                    } else {
+                      setPicked(i);
+                      focus(2);
+                    }
+                  }}
+                  aria-label={a[lang]}
+                >
+                  <Disc title={a.word} number={a.number} color={a.color} />
+                  <span>{a.number}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="neo-medal-wall">
+            <span className="wall-label">RECOGNITION</span>
+            <div>
+              {awards.map((a, i) => (
+                <button
+                  key={a.name.en}
+                  className={
+                    'neo-medal' + (zone === 3 && medal === i ? ' active' : '')
+                  }
+                  onPointerEnter={(e) => {
+                    if (e.pointerType === 'mouse') {
+                      setMedal(i);
+                      focus(3);
+                    }
+                  }}
+                  onFocus={() => {
+                    setMedal(i);
+                    focus(3);
+                  }}
+                  onClick={() => {
+                    if (zone === 3 && medal === i) {
+                      onSound('award');
+                      onAward(i);
+                    } else {
+                      setMedal(i);
+                      focus(3);
+                    }
+                  }}
+                  aria-label={a.name[lang]}
+                >
+                  <span
+                    className="medal-sprite"
+                    style={{
+                      backgroundPosition: [
+                        '0% 0%',
+                        '100% 0%',
+                        '0% 100%',
+                        '100% 100%',
+                      ][i],
+                    }}
+                  />
+                  <span className="medal-year">{a.year}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+          <button
+            className="neo-experience-target"
+            onPointerEnter={(e) => {
+              if (e.pointerType === 'mouse') focus(4);
+            }}
+            onFocus={() => focus(4)}
+            onClick={() => {
+              if (zone === 4) {
+                onSound('case');
+                onRead(4);
+              } else focus(4);
+            }}
+          >
+            <span>PERSONAL NOTES</span>
+            <strong>{tr('过往经历', 'Experience')}</strong>
+          </button>
+        </div>
+        {zone > 0 && (
+          <button className="neo-reset" onClick={() => focus(0)}>
+            <ArrowLeft size={16} />
+            {tr('回到全景', 'Full room')}
+          </button>
+        )}
+        <div className="neo-coordinate">
+          <Focus size={14} />
+          {zone === 0 ? 'STUDIO / EXPLORE' : 'FOCUS / 0' + zone}
+        </div>
+        {failed && (
+          <p className="neo-image-error">
+            {tr(
+              '场景图未能加载，可使用下方目录浏览。',
+              'The scene could not load. Use the navigation below.',
+            )}
+          </p>
+        )}
+        <div
+          className={'neo-object-note' + (zone === 0 ? ' overview-note' : '')}
+        >
+          <span>
+            {zone === 0 ? <MousePointer2 size={16} /> : <Disc3 size={16} />}{' '}
+            {names[zone]}
+          </span>
+          <p>{descriptions[zone]}</p>
+          {zone > 0 && (
+            <button onClick={open}>
+              {zone === 1
+                ? tr('观看戏剧作品', 'Watch theatre project')
+                : zone === 3
+                  ? tr('查看奖项', 'View award')
+                  : tr('打开', 'Open')}
+              <ArrowUpRight size={16} />
+            </button>
+          )}
+        </div>
+      </div>
+      <div className="neo-bottom-bar">
+        <nav aria-label={tr('录音棚探索区域', 'Studio areas')}>
+          {names.map((n, i) => (
+            <button key={i} onClick={() => focus(i)} aria-pressed={zone === i}>
+              <span>0{i}</span>
+              {n}
             </button>
           ))}
         </nav>
-        <div className="environment-footer">
-          <span>
-            <Disc3 size={14} />
-            {tr(
-              '每张唱片，都有它的声场。',
-              'Every disc has its own sound world.',
-            )}
-          </span>
-          <span>
-            {sound
-              ? tr('交互音效已开启', 'INTERACTION SOUND ON')
-              : tr('点击顶部音效开关，开启聆听', 'ENABLE SOUND IN THE TOP BAR')}
-          </span>
-        </div>
+        <p>
+          {tr(
+            '移动探索 / 点击打开 / ESC 返回',
+            'Explore / Click to open / ESC to return',
+          )}
+        </p>
       </div>
+      <nav
+        className="neo-direct-links"
+        aria-label={tr('直接浏览作品和经历', 'Browse works and experience')}
+      >
+        {albums.map((a) => (
+          <button
+            key={a.word}
+            onClick={() => {
+              onSound('case');
+              onRead(a.page);
+            }}
+          >
+            <span>{a.number}</span>
+            {a[lang]}
+            <ArrowUpRight size={14} />
+          </button>
+        ))}
+      </nav>
     </section>
   );
 }
