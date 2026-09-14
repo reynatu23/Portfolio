@@ -651,8 +651,8 @@ export default function Portfolio() {
           </DialogTitle>
           <DialogDescription>
             {tr(
-              '背景音乐为 Kevin MacLeod 的 Airport Lounge，按 CC BY 4.0 许可使用，已转换为网页试听格式。交互音效为本网站合成的柔和电子音。音乐与音效均可独立控制。',
-              'Background music: Airport Lounge by Kevin MacLeod, licensed under CC BY 4.0 and encoded for web playback. Interface sounds are soft electronic tones synthesized for this website. Music and effects have separate controls.',
+              '背景音乐为 Kevin MacLeod 的 Airport Lounge（CC BY 4.0）。门、CD 盒与按钮使用 Freesound 的 CC0 录音；奖章使用合成的轻微金属碰撞声。音乐与音效均可独立控制。',
+              'Music: Airport Lounge by Kevin MacLeod (CC BY 4.0). Door, CD case and button sounds use CC0 Freesound recordings; medal contacts are synthesized. Music and effects have separate controls.',
             )}
           </DialogDescription>
           <ul>
@@ -667,6 +667,15 @@ export default function Portfolio() {
               </li>
             ))}
           </ul>
+          <a
+            className="cd-document-link"
+            href="/sounds/CREDITS.md"
+            target="_blank"
+            rel="noreferrer"
+          >
+            {tr('交互音效作者与来源', 'Interaction recording credits')}
+            <ArrowUpRight size={15} />
+          </a>
           <a
             className="cd-document-link"
             href="https://creativecommons.org/licenses/by/4.0/"

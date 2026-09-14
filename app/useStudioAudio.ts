@@ -1,6 +1,6 @@
 'use client';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { SoundCue } from './audio';
+import { soundFiles, type SoundCue } from './audio';
 
 export function useStudioAudio(ducked: boolean) {
   const [sound, setSound] = useState(false);
@@ -11,17 +11,24 @@ export function useStudioAudio(ducked: boolean) {
   const context = useRef<AudioContext | null>(null);
   const music = useRef<HTMLAudioElement | null>(null);
   const lastCue = useRef(0);
+  const activeEffects = useRef(new Set<HTMLAudioElement>());
   useEffect(() => {
+    const effects = activeEffects.current;
     const track = new Audio('/sounds/lounge.mp3');
     track.loop = true;
     track.preload = 'none';
     track.volume = 0.18;
     music.current = track;
     return () => {
+      for (const effect of effects) effect.pause();
+      effects.clear();
       track.pause();
       track.removeAttribute('src');
       track.load();
-      void context.current?.close();
+      const previous = context.current;
+      context.current = null;
+      if (previous && previous.state !== 'closed')
+        void previous.close().catch(() => {});
     };
   }, []);
   useEffect(() => {
@@ -43,11 +50,15 @@ export function useStudioAudio(ducked: boolean) {
     setError(false);
     if (sound) {
       setSound(false);
-      await context.current?.suspend();
+      for (const effect of activeEffects.current) effect.pause();
+      activeEffects.current.clear();
+      if (context.current?.state === 'running')
+        await context.current.suspend().catch(() => setError(true));
       return;
     }
     try {
-      context.current ??= new AudioContext();
+      if (!context.current || context.current.state === 'closed')
+        context.current = new AudioContext();
       await context.current.resume();
       setSound(true);
     } catch {
@@ -77,50 +88,55 @@ export function useStudioAudio(ducked: boolean) {
       if (
         !sound ||
         !ctx ||
+        ctx.state === 'closed' ||
         effectsVolume === 0 ||
         performance.now() - lastCue.current < 95
       )
         return;
       lastCue.current = performance.now();
-      void ctx.resume();
-      const t = ctx.currentTime,
-        duration = cue === 'door' ? 0.36 : cue === 'award' ? 0.3 : 0.19;
-      const base = { button: 180, case: 230, door: 120, award: 310 }[cue];
-      const osc = ctx.createOscillator(),
-        harmonic = ctx.createOscillator(),
-        gain = ctx.createGain(),
-        filter = ctx.createBiquadFilter();
-      osc.type = 'sine';
-      harmonic.type = 'sine';
-      osc.frequency.setValueAtTime(base, t);
-      osc.frequency.exponentialRampToValueAtTime(base * 0.72, t + duration);
-      harmonic.frequency.setValueAtTime(base * 1.5, t);
-      harmonic.frequency.exponentialRampToValueAtTime(
-        base * 1.05,
-        t + duration,
-      );
-      filter.type = 'lowpass';
-      filter.frequency.value = 850;
-      filter.Q.value = 0.5;
-      gain.gain.setValueAtTime(0, t);
-      gain.gain.linearRampToValueAtTime(
-        (effectsVolume / 100) * 0.12 * (ducked ? 0.35 : 1),
-        t + 0.025,
-      );
-      gain.gain.exponentialRampToValueAtTime(0.0001, t + duration);
-      osc.connect(filter);
-      harmonic.connect(filter);
-      filter.connect(gain).connect(ctx.destination);
-      osc.start(t);
-      harmonic.start(t + 0.012);
-      osc.stop(t + duration + 0.03);
-      harmonic.stop(t + duration + 0.03);
-      harmonic.onended = () => {
-        osc.disconnect();
-        harmonic.disconnect();
-        filter.disconnect();
-        gain.disconnect();
-      };
+      void ctx.resume().catch(() => setError(true));
+      if (cue !== 'award') {
+        const player = new Audio(soundFiles[cue]);
+        player.volume = Math.min(
+          1,
+          (effectsVolume / 100) * (ducked ? 0.4 : 1.8),
+        );
+        activeEffects.current.add(player);
+        const release = () => activeEffects.current.delete(player);
+        player.onended = release;
+        player.onerror = release;
+        void player.play().catch(() => {
+          release();
+          setError(true);
+        });
+        return;
+      }
+      // Three quiet, inharmonic contacts suggest a hanging medal moving.
+      const t = ctx.currentTime;
+      [0, 0.065, 0.15].forEach((offset, contact) => {
+        [1337, 2189, 3541].forEach((frequency, partial) => {
+          const oscillator = ctx.createOscillator();
+          const gain = ctx.createGain();
+          const onset = t + offset;
+          const duration = 0.12 + partial * 0.035;
+          oscillator.frequency.value = frequency * (1 + contact * 0.017);
+          gain.gain.setValueAtTime(0, onset);
+          gain.gain.linearRampToValueAtTime(
+            (((effectsVolume / 100) * 0.045) /
+              ((partial + 1) * (contact + 1))) *
+              (ducked ? 0.35 : 1),
+            onset + 0.0015,
+          );
+          gain.gain.exponentialRampToValueAtTime(0.00001, onset + duration);
+          oscillator.connect(gain).connect(ctx.destination);
+          oscillator.start(onset);
+          oscillator.stop(onset + duration + 0.01);
+          oscillator.onended = () => {
+            oscillator.disconnect();
+            gain.disconnect();
+          };
+        });
+      });
     },
     [sound, effectsVolume, ducked],
   );

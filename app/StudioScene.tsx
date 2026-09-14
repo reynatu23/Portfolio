@@ -64,26 +64,30 @@ type Props = {
 };
 const positions = [
   { x: 50, y: 50, s: 1 },
-  { x: 38, y: 62, s: 1.75 },
-  { x: 62, y: 33, s: 2.55 },
+  { x: 14, y: 64, s: 1.75 },
+  { x: 59, y: 40, s: 1.85 },
   { x: 82, y: 31, s: 2.5 },
-  { x: 74, y: 64, s: 1.65 },
+  { x: 63, y: 57, s: 1.65 },
 ];
 export default function StudioScene({
   lang,
   view,
+  onView,
   onRead,
   onSound,
   onAward,
   onDrama,
 }: Props) {
-  const [zone, setZone] = useState(view === 'shelf' ? 2 : 0),
+  const [zone, setZone] = useState(0),
     [picked, setPicked] = useState(0),
     [medal, setMedal] = useState(0);
   const [failed, setFailed] = useState(false);
   const camera = useRef<HTMLDivElement>(null);
+  const entrance = useRef<HTMLDivElement>(null);
+  const [entering, setEntering] = useState(false);
   const tr = (zh: string, en: string) => (lang === 'zh' ? zh : en);
   useEffect(() => {
+    if (view === 'front' || !camera.current) return;
     const p = positions[zone],
       reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const limit = (p.s - 1) * 50,
@@ -99,7 +103,23 @@ export default function StudioScene({
     return () => {
       animation.kill();
     };
-  }, [zone]);
+  }, [zone, view]);
+  useEffect(() => {
+    if (!entering || !entrance.current) return;
+    const reduced = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
+    const animation = gsap.to(entrance.current, {
+      scale: reduced ? 1 : 2.4,
+      opacity: 0,
+      duration: reduced ? 0 : 1.05,
+      ease: 'power2.inOut',
+      onComplete: () => onView('shelf'),
+    });
+    return () => {
+      animation.kill();
+    };
+  }, [entering, onView]);
   useEffect(() => {
     const key = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setZone(0);
@@ -110,7 +130,7 @@ export default function StudioScene({
   function focus(n: number) {
     if (n !== zone) {
       setZone(n);
-      onSound('button');
+      onSound(n === 3 ? 'award' : n === 2 ? 'case' : 'button');
     }
   }
   const names = [
@@ -140,6 +160,78 @@ export default function StudioScene({
     if (zone === 3) onAward(medal);
     if (zone === 4) onRead(4);
   }
+  if (view === 'front')
+    return (
+      <section className="neo-studio white-exterior">
+        <div className="neo-room-heading">
+          <div>
+            <span>CHONGTING TU / SOUND DESIGN</span>
+            <h1>
+              {tr('每个故事，都有它的声音。', 'Every story has a sound.')}
+            </h1>
+          </div>
+          <span className="room-index">WELCOME TO MY STUDIO</span>
+        </div>
+        <div className="exterior-viewport">
+          <div
+            ref={entrance}
+            className={'exterior-camera' + (entering ? ' entering' : '')}
+          >
+            <img
+              src="/art/exterior.jpg"
+              alt={tr(
+                '白色手绘录音室外景，树下的猫、窗户与中央入口',
+                'A pencil-drawn studio exterior with a cat, a window and a central door',
+              )}
+            />
+            <div className="exterior-sign">
+              <span>CHONGTING TU</span>
+              <strong>SOUND STUDIO</strong>
+            </div>
+            <button
+              className="exterior-door"
+              disabled={entering}
+              onClick={() => {
+                onSound('door');
+                setEntering(true);
+              }}
+              aria-label={tr('推门进入录音室', 'Enter the recording studio')}
+            >
+              <span>
+                {entering
+                  ? tr('欢迎进来…', 'Welcome inside…')
+                  : tr('推门进入', 'Enter the studio')}{' '}
+                <ArrowUpRight size={16} />
+              </span>
+            </button>
+          </div>
+          <p className="exterior-invitation">
+            {tr(
+              '点击门，开始探索。戴上耳机，听见更多细节。',
+              'Click the door to explore. Headphones bring you closer.',
+            )}
+          </p>
+        </div>
+        <nav
+          className="neo-direct-links"
+          aria-label={tr('直接浏览作品和经历', 'Browse works and experience')}
+        >
+          {albums.map((a) => (
+            <button
+              key={a.word}
+              onClick={() => {
+                onSound('case');
+                onRead(a.page);
+              }}
+            >
+              <span>{a.number}</span>
+              {a[lang]}
+              <ArrowUpRight size={14} />
+            </button>
+          ))}
+        </nav>
+      </section>
+    );
   return (
     <section className="neo-studio">
       <div className="neo-room-heading">
@@ -152,14 +244,22 @@ export default function StudioScene({
       <div className={'neo-viewport zone-' + zone}>
         <div className="neo-camera" ref={camera}>
           <img
-            src="/art/neon-studio.png"
+            src="/art/interior.jpg"
             className="neo-room-image"
             alt={tr(
-              '蓝白色未来录音棚，窗边调音台与挂有 CD、奖章的墙面',
-              'A blue-and-white recording studio with a mixing desk, wall-mounted CDs and medals',
+              '白色手绘录音棚，左侧调音台与挂有 CD、奖章的墙面',
+              'A white pencil-drawn recording studio with a mixing desk, wall-mounted CDs and medals',
             )}
             onError={() => setFailed(true)}
           />
+          <div
+            className="acoustic-panels acoustic-panels-left"
+            aria-hidden="true"
+          >
+            <i />
+            <i />
+            <i />
+          </div>
           <button
             className="neo-console-target"
             onPointerEnter={(e) => {
@@ -286,12 +386,15 @@ export default function StudioScene({
             <strong>{tr('过往经历', 'Experience')}</strong>
           </button>
         </div>
-        {zone > 0 && (
-          <button className="neo-reset" onClick={() => focus(0)}>
-            <ArrowLeft size={16} />
-            {tr('回到全景', 'Full room')}
-          </button>
-        )}
+        <button
+          className="neo-reset"
+          onClick={() => (zone > 0 ? focus(0) : onView('front'))}
+        >
+          <ArrowLeft size={16} />
+          {zone > 0
+            ? tr('回到全景', 'Full room')
+            : tr('回到门外', 'Back outside')}
+        </button>
         <div className="neo-coordinate">
           <Focus size={14} />
           {zone === 0 ? 'STUDIO / EXPLORE' : 'FOCUS / 0' + zone}

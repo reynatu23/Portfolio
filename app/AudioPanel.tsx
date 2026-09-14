@@ -97,8 +97,8 @@ export default function AudioPanel({
           </div>
           <p>
             {tr(
-              '柔和电子音 · 低频触感',
-              'Soft electronic tones · muted transients',
+              '按钮点击 · CD 卡扣 · 轻微金属碰撞',
+              'UI clicks · CD case snaps · subtle metal contacts',
             )}
           </p>
         </section>
